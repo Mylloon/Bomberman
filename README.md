@@ -44,3 +44,6 @@ Puis pour lancer le jeu :
 
 ## Présentation
 La présentation se trouve dans le [dossier présentation](presentation/presentation.tex) du projet.
+
+## Sources
+- [Image du dépôt](https://pixabay.com/vectors/bomb-cartoon-iconic-2025548/)
