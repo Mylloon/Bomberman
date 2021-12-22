@@ -1,4 +1,4 @@
-#  Makefile 
+#  Makefile
 #  Auteur : Farès BELHADJ
 #  Email  : amsi@up8.edu
 #  Date   : 16/11/2021
@@ -16,8 +16,8 @@ CFLAGS = -Wall -O3
 CPPFLAGS = -I.
 LDFLAGS = -lm
 # définition des fichiers et dossiers
-PACKNAME = sc_00_07
-PROGNAME = rasterizer
+PACKNAME = sc_00_01
+PROGNAME = bomberman
 VERSION = 0.1
 distdir = $(PACKNAME)_$(PROGNAME)-$(VERSION)
 HEADERS = rasterize.h
@@ -74,7 +74,7 @@ doc: $(DOXYFILE)
 	mv -f $<.new $<
 	cd documentation && doxygen && cd ..
 msvc: $(VSCFILES)
-	@echo "Now these files ($?) already exist. If you wish to regenerate them, you should first delete them manually."  
+	@echo "Now these files ($?) already exist. If you wish to regenerate them, you should first delete them manually."
 $(VSCFILES):
 	@echo "Generating $@ ..."
 	@cat ../../Windows/templates/gl4dSample$(suffix $@) | sed -e "s/INSERT_PROJECT_NAME/$(PROGNAME)/g" | sed -e "s/INSERT_TARGET_NAME/$(PROGNAME)/" | sed -e "s/INSERT_SOURCE_FILES/$(MSVCSRC)/" > $@
