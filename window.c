@@ -44,7 +44,7 @@ static float _ycam = 3.0f;
 int main(int argc, char ** argv) {
     /* tentative de création d'une fenêtre pour GL4Dummies */
     if(!gl4duwCreateWindow(argc, argv, /* args du programme */
-             "The DIY Rasterizer", /* titre */
+             "Bomberman ⋅ A. KENNEL L2-A", /* titre */
              10, 10, 800, 600, /* x, y, largeur, heuteur */
              GL4DW_SHOWN) /* état visible */) {
         /* ici si échec de la création souvent lié à un problème d'absence
