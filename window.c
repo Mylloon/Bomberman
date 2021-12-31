@@ -48,12 +48,13 @@ static int _grilleH = 7;
 
 /* Définition d'un personnage */
 typedef struct perso_t {
-  float x, y, z;
+  float x, y, z; // coordonées
+  surface_t * perso; // objet
 } perso_t;
 
 /* Définition de nos deux joueurs */
-perso_t _herosA = { 6.f, 0.f, -6.f }; // à droite
-perso_t _herosB = { -10.f, 0.f, 0.f }; // à gauche
+perso_t _herosA = { 6.f, 0.f, -6.f, NULL }; // à droite
+perso_t _herosB = { -10.f, 0.f, 0.f, NULL }; // à gauche
 
 /* Clavier virtuel */
 enum {
@@ -148,38 +149,55 @@ void idle(void) {
 
     float vitesse = 10.f;
     /* Mouvements du héros A */
-    float zA = (float)((_herosA.z + _cubeSize * _grilleH / 2) / _cubeSize); // ligne - hauteur
+    /* Coordonées x, z */
+    float zA = (float)((_herosA.z + _cubeSize * _grilleH / 2) / _cubeSize); // ligne   - hauteur
     float xA = (float)((_herosA.x + _cubeSize * _grilleW / 2) / _cubeSize); // colonne - longueur
+
+    /* Coordonnées joueur A */
+    int coorDroiteA = (int)(zA + .5f) * _grilleH + (int)(xA + 1.f);
+    int coorHautA   = (int)zA         * _grilleH + (int)(xA + .5f);
+    int coorGaucheA = (int)(zA + .5f) * _grilleH + (int)xA;
+    int coorBasA    = (int)(zA + 1.f) * _grilleH + (int)(xA + .5f);
+
     if(_vkeyboard[VK_RIGHT])
-        if(_grille[(int)(zA + .5f) * _grilleH + (int)(xA + 1.f)] == 0) // collision à droite du plateau
+        if(_grille[coorDroiteA] == 0) // collision à droite du plateau
             _herosA.x += vitesse * dt;
     if(_vkeyboard[VK_UP])
-        if(_grille[(int)zA * _grilleH + (int)(xA + .5f)] == 0) // collision en haut plateau
+        if(_grille[coorHautA] == 0) // collision en haut plateau
             _herosA.z -= vitesse * dt;
     if(_vkeyboard[VK_LEFT])
-        if(_grille[(int)(zA + .5f) * _grilleH + (int)xA] == 0) // collision à gauche du plateau
+        if(_grille[coorGaucheA] == 0) // collision à gauche du plateau
             _herosA.x -= vitesse * dt;
     if(_vkeyboard[VK_DOWN])
-        if(_grille[(int)(zA + 1.f) * _grilleH + (int)(xA + .5f)] == 0) // collision en bas du plateau
+        if(_grille[coorBasA] == 0) // collision en bas du plateau
             _herosA.z += vitesse * dt;
-    printf("\n=========== Héros A ===========\n li = %d, col = %d\n", (int)(zA + .5f), (int)(xA + .5f));
+    printf("\n==== Héros A ====\n li = %d, col = %d\n", (int)(zA + .5f), (int)(xA + .5f));
+    printf("d=%d h=%d g=%d b=%d\n", coorDroiteA, coorHautA, coorGaucheA, coorBasA);
 
     /* Mouvements du héros B */
+    /* Coordonées x, z */
     float zB = (float)((_herosB.z + _cubeSize * _grilleH / 2) / _cubeSize); // ligne - hauteur
     float xB = (float)((_herosB.x + _cubeSize * _grilleW / 2) / _cubeSize); // colonne - longueur
+
+    /* Type bloc à la droite/haut/gauche/bas du joueur A */
+    int dB = _grille[(int)(zB + .5f) * _grilleH + (int)(xB + 1.f)]; // droite A
+    int hB = _grille[(int)zB         * _grilleH + (int)(xB + .5f)]; // haut A
+    int gB = _grille[(int)(zB + .5f) * _grilleH + (int)xB];         // gauche A
+    int bB = _grille[(int)(zB + 1.f) * _grilleH + (int)(xB + .5f)]; // bas A
+
     if(_vkeyboard[VK_d])
-        if(_grille[(int)(zB + .5f) * _grilleH + (int)(xB + 1.f)] == 0) // collision à droite du plateau
+        if(dB == 0) // collision à droite du plateau
             _herosB.x += vitesse * dt;
     if(_vkeyboard[VK_z])
-        if(_grille[(int)zB * _grilleH + (int)(xB + .5f)] == 0) // collision en haut plateau
+        if(hB == 0) // collision en haut plateau
             _herosB.z -= vitesse * dt;
     if(_vkeyboard[VK_q])
-        if(_grille[(int)(zB + .5f) * _grilleH + (int)xB] == 0) // collision à gauche du plateau
+        if(gB == 0) // collision à gauche du plateau
             _herosB.x -= vitesse * dt;
     if(_vkeyboard[VK_s])
-        if(_grille[(int)(zB + 1.f) * _grilleH + (int)(xB + .5f)] == 0) // collision en bas du plateau
+        if(bB == 0) // collision en bas du plateau
             _herosB.z += vitesse * dt;
-    printf("=========== Héros B ===========\n li = %d, col = %d\n===============================\n", (int)(zB + .5f), (int)(xB + .5f));
+    printf("==== Héros B ====\n li = %d, col = %d\n=================\n", (int)(zB + .5f), (int)(xB + .5f));
 }
 
 /*!\brief Fonction appelée à chaque display. */
