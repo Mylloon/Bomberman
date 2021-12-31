@@ -1,21 +1,24 @@
 /*!\file window.c
  * \author Farès BELHADJ, amsi@up8.edu
+ * \student Anri KENNEL, anri.kennel@etud.univ-paris8.fr
  * \date November 16, 2021.
  */
 #include <assert.h>
-/* inclusion des entêtes de fonctions de gestion de primitives simples
+
+/* Inclusion des entêtes de fonctions de gestion de primitives simples
  * de dessin. La lettre p signifie aussi bien primitive que
  * pédagogique. */
 #include <GL4D/gl4dp.h>
-/* inclure la bibliothèque de rendu DIY */
+
+/* Inclure la bibliothèque de rendu du cours */
 #include "rasterize.h"
 
-/* inclusion des entêtes de fonctions de création et de gestion de
+/* Inclusion des entêtes de fonctions de création et de gestion de
  * fenêtres système ouvrant un contexte favorable à GL4dummies. Cette
  * partie est dépendante de la bibliothèque SDL2 */
 #include <GL4D/gl4duw_SDL2.h>
 
-/* protos de fonctions locales (static) */
+/* Fonctions locales (static) */
 static void init(void);
 static void idle(void);
 static void draw(void);
@@ -23,22 +26,22 @@ static void keyu(int keycode);
 static void keyd(int keycode);
 static void sortie(void);
 
-/*!\brief une surface représentant un cube */
+/*!\brief Surface représentant un cube */
 static surface_t * _cube = NULL;
 static float _cubeSize = 4.0f;
 
-/* variable d'état pour activer/désactiver la synchronisation verticale */
+/* Variable d'état pour activer/désactiver la synchronisation verticale */
 static int _use_vsync = 1;
 
-/* on créé une grille de positions où il y aura des cubes */
+/* Grille de positions où il y aura des cubes */
 static int _grille[] = {
-  1, 1, 1, 1, 1, 1, 1,
-  1, 0, 1, 0, 0, 0, 1,
-  1, 0, 1, 0, 0, 0, 1,
-  1, 0, 1, 1, 0, 1, 1,
-  1, 0, 0, 0, 0, 1, 1,
-  1, 0, 0, 1, 0, 0, 1,
-  1, 1, 1, 1, 1, 1, 1
+    1, 1, 1, 1, 1, 1, 1,
+    1, 0, 1, 0, 0, 0, 1,
+    1, 0, 1, 0, 0, 0, 1,
+    1, 0, 1, 1, 0, 1, 1,
+    1, 0, 0, 0, 0, 1, 1,
+    1, 0, 0, 1, 0, 0, 1,
+    1, 1, 1, 1, 1, 1, 1
 };
 static int _grilleW = 7;
 static int _grilleH = 7;
@@ -52,7 +55,7 @@ typedef struct perso_t {
 perso_t _herosA = { 6.f, 0.f, -6.f }; // à droite
 perso_t _herosB = { -10.f, 0.f, 0.f }; // à gauche
 
-/* clavier virtuel */
+/* Clavier virtuel */
 enum {
     /* Héros A */
     VK_RIGHT = 0,
@@ -66,39 +69,39 @@ enum {
     VK_q,
     VK_s,
 
-    /* toujours à la fin */
+    /* Toujours à la fin */
     VK_SIZEOF
 };
 
 int _vkeyboard[VK_SIZEOF] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-/*!\brief paramètre l'application et lance la boucle infinie. */
+/*!\brief Paramètre l'application et lance la boucle infinie. */
 int main(int argc, char ** argv) {
-    /* tentative de création d'une fenêtre pour GL4Dummies */
+    /* Tentative de création d'une fenêtre pour GL4Dummies */
     if(!gl4duwCreateWindow(argc, argv, /* args du programme */
              "Bomberman ⋅ A. KENNEL L2-A", /* titre */
              10, 10, 800, 600, /* x, y, largeur, heuteur */
              GL4DW_SHOWN) /* état visible */) {
-        /* ici si échec de la création souvent lié à un problème d'absence
+        /* Ici si échec de la création souvent lié à un problème d'absence
          * de contexte graphique ou d'impossibilité d'ouverture d'un
          * contexte OpenGL (au moins 3.2) */
         return 1;
     }
     init();
 
-    /* mettre en place la fonction d'interception clavier touche pressée */
+    /* Mets en place la fonction d'interception clavier touche pressée */
     gl4duwKeyDownFunc(keyd);
 
-    /* mettre en place la fonction d'interception clavier touche relachée */
+    /* Mets en place la fonction d'interception clavier touche relachée */
     gl4duwKeyUpFunc(keyu);
 
-    /* mettre en place la fonction idle (simulation, au sens physique du terme) */
+    /* Mets en place la fonction idle (simulation, au sens physique du terme) */
     gl4duwIdleFunc(idle);
 
-    /* mettre en place la fonction de display */
+    /* Mets en place la fonction de display */
     gl4duwDisplayFunc(draw);
 
-    /* boucle infinie pour éviter que le programme ne s'arrête et ferme
+    /* Boucle infinie pour éviter que le programme ne s'arrête et ferme
      * la fenêtre immédiatement */
     gl4duwMainLoop();
     return 0;
@@ -107,16 +110,16 @@ int main(int argc, char ** argv) {
 /*!\brief init de nos données, spécialement le plateau */
 void init(void) {
     GLuint id;
-    /* création d'un screen GL4Dummies (texture dans laquelle nous
-     * pouvons dessiner) aux dimensions de la fenêtre.  IMPORTANT de
+    /* Création d'un screen GL4Dummies (texture dans laquelle nous
+     * pouvons dessiner) aux dimensions de la fenêtre. IMPORTANT de
      * créer le screen avant d'utiliser les fonctions liées au
      * textures */
     gl4dpInitScreen();
 
-    /* on créé le cube */
-    _cube = mk_cube(); /* ça fait 2x6 triangles      */
+    /* Création du cube */
+    _cube = mk_cube(); /* ça fait 2x6 triangles */
 
-    /* on rajoute la texture */
+    /* Rajoute la texture */
     id = get_texture_from_BMP("images/tex.bmp");
     set_texture_id(_cube, id);
 
@@ -126,30 +129,27 @@ void init(void) {
     /* Affichage des ombres */
     enable_surface_option(_cube, SO_USE_LIGHTING);
 
-    /* si _use_vsync != 0, on active la synchronisation verticale */
+    /* Si _use_vsync != 0, on active la synchronisation verticale */
     SDL_GL_SetSwapInterval(_use_vsync);
 
-    /* mettre en place la fonction à appeler en cas de sortie */
+    /* Mets en place la fonction à appeler en cas de sortie */
     atexit(sortie);
 }
 
-/*!\brief la fonction appellée à chaque idle */
+/*!\brief Fonction appellée à chaque idle (entre chaque frame) */
 void idle(void) {
     /* on récupère le delta-temps */
     static double t0 = 0.0; // le temps à la frame précédente
     double t, dt;
     t = gl4dGetElapsedTime();
     dt = (t - t0) / 1000.0; // diviser par mille pour avoir des secondes
-    // pour le frame d'après, je mets à jour t0
+    /* pour le frame d'après, mets à-jour t0 */
     t0 = t;
 
     /* Mouvements du héros A */
-    float zA = (float)((_herosA.z + _cubeSize * _grilleH / 2) / _cubeSize); // ligne
-    float xA = (float)((_herosA.x + _cubeSize * _grilleW / 2) / _cubeSize); // colonne
-    printf("%d - %d - ", (int)zA, (int)xA);
-    // int truc = (int)((zA + .5f) * (xA + .5f));
-    int truc = (zA - 1) * _grilleH * xA;
-    printf("(%d)%d", truc, _grille[truc]);
+    float zA = (float)((_herosA.z + _cubeSize * _grilleH / 2) / _cubeSize); // ligne - hauteur
+    float xA = (float)((_herosA.x + _cubeSize * _grilleW / 2) / _cubeSize); // colonne - longueur
+    int positionA = (int)(zA + .5f) * _grilleH + (int)(xA + .5f); // position dans la grille
     if(_vkeyboard[VK_RIGHT])
         if(xA < (_grilleW - 2)) // collision à droite du plateau
             _herosA.x += 10.f * dt;
@@ -162,11 +162,12 @@ void idle(void) {
     if(_vkeyboard[VK_DOWN]) // collision en bas du plateau
         if(zA < (_grilleH - 2))
             _herosA.z += 10.f * dt;
-    printf("\n========== Héros A ==========\nli = %f, col = %f\n", zA, xA);
+    printf("\n=============== Héros A ===============\nli = %f, col = %f, pos = %d\n", zA, xA, positionA);
 
     /* Mouvements du héros B */
-    float zB = (float)((_herosB.z + _cubeSize * _grilleH / 2) / _cubeSize); // ligne
-    float xB = (float)((_herosB.x + _cubeSize * _grilleW / 2) / _cubeSize); // colonne
+    float zB = (float)((_herosB.z + _cubeSize * _grilleH / 2) / _cubeSize); // ligne - hauteur
+    float xB = (float)((_herosB.x + _cubeSize * _grilleW / 2) / _cubeSize); // colonne - longueur
+    int positionB = (int)(zB + .5f) * _grilleH + (int)(xB + .5f); // position dans la grille
     if(_vkeyboard[VK_d])
         if(xB < (_grilleW - 2)) // collision à droite du plateau
             _herosB.x += 10.f * dt;
@@ -179,46 +180,46 @@ void idle(void) {
     if(_vkeyboard[VK_s]) // collision en bas du plateau
         if(zB < (_grilleH - 2))
             _herosB.z += 10.f * dt;
-    printf("========== Héros B ==========\nli = %f, col = %f\n=============================\n", zB, xB);
+    printf("=============== Héros B ===============\nli = %f, col = %f, pos = %d\n=======================================\n", zB, xB, positionB);
 }
 
-/*!\brief la fonction appelée à chaque display. */
+/*!\brief Fonction appelée à chaque display. */
 void draw(void) {
     vec4 couleurPlateau = {0.2, 0.2, 0.2, 1} /* Gris */, couleurHerosA = {0.15, 0.5, 0.15, 1} /* Vert */, couleurHerosB = {0.2, 0.2, 0.7, 1} /* Bleu */;
 
-    /* on va récupérer le delta-temps */
+    /* On va récupérer le delta-temps */
     static double t0 = 0.0; // le temps à la frame précédente
     double t, dt;
     t = gl4dGetElapsedTime();
     dt = (t - t0) / 1000.0; // diviser par mille pour avoir des secondes
-    // pour le frame d'après, je mets à jour t0
+    // Pour le frame d'après, mets à-jour t0
     t0 = t;
 
     static float a = 0.0f;
     float model_view_matrix[16], projection_matrix[16], nmv[16];
 
-    /* effacer l'écran et le buffer de profondeur */
+    /* Efface l'écran et le buffer de profondeur */
     gl4dpClearScreen();
     clear_depth_map();
 
-    /* des macros facilitant le travail avec des matrices et des
+    /* Des macros facilitant le travail avec des matrices et des
      * vecteurs se trouvent dans la bibliothèque GL4Dummies, dans le
      * fichier gl4dm.h */
-    /* charger un frustum dans projection_matrix */
+    /* Charger un frustum dans projection_matrix */
     MFRUSTUM(projection_matrix, -0.05f, 0.05f, -0.05f, 0.05f, 0.1f, 1000.0f);
-    /* charger la matrice identité dans model-view */
+    /* Charger la matrice identité dans model-view */
     MIDENTITY(model_view_matrix);
-    /* on place la caméra en arrière-haut, elle regarde le centre de la scène */
-    lookAt(model_view_matrix, 0, 25 + 50 /* fabs(cos(a * M_PI / 180.0f)) */, 5, 0, 0, 0, 0, 0, -1);
+    /* On place la caméra en arrière-haut, elle regarde le centre de la scène */
+    lookAt(model_view_matrix, 0, 30 /* zoom */, 30 /* inclinaison */, 0, 0, 0, 0, 0, -1);
 
-    /* pour centrer la grille par rapport au monde */
+    /* Pour centrer la grille par rapport au monde */
     float cX = -_cubeSize * _grilleW / 2.0f;
     float cZ = -_cubeSize * _grilleH / 2.0f;
 
-    /* on change la couleur */
+    /* On change la couleur */
     _cube->dcolor = couleurPlateau;
 
-    /* pour toutes les cases de la grille, afficher un cube quand il y a
+    /* Pour toutes les cases de la grille, afficher un cube quand il y a
      * un 1 dans la grille */
     for(int i = 0; i < _grilleW; ++i)
         for(int j = 0; j < _grilleH; ++j)
@@ -232,29 +233,29 @@ void draw(void) {
                 transform_n_rasterize(_cube, nmv, projection_matrix);
             }
 
-    /* on dessine le héros A */
+    /* Dessine le héros A */
     _cube->dcolor = couleurHerosA;
     memcpy(nmv, model_view_matrix, sizeof nmv);
     translate(nmv, _herosA.x, _herosA.y, _herosA.z);
     scale(nmv, _cubeSize / 2.0f, _cubeSize / 2.0f, _cubeSize / 2.0f);
     transform_n_rasterize(_cube, nmv, projection_matrix);
 
-    /* on dessine le héros B */
+    /* Dessine le héros B */
     _cube->dcolor = couleurHerosB;
     memcpy(nmv, model_view_matrix, sizeof nmv);
     translate(nmv, _herosB.x, _herosB.y, _herosB.z);
     scale(nmv, _cubeSize / 2.0f, _cubeSize / 2.0f, _cubeSize / 2.0f);
     transform_n_rasterize(_cube, nmv, projection_matrix);
 
-    /* déclarer qu'on a changé des pixels du screen (en bas niveau) */
+    /* Déclarer qu'on a changé des pixels du screen (en bas niveau) */
     gl4dpScreenHasChanged();
 
-    /* fonction permettant de raffraîchir l'ensemble de la fenêtre*/
+    /* Fonction permettant de raffraîchir l'ensemble de la fenêtre*/
     gl4dpUpdateScreen(NULL);
     a += 0.1f * 360.0f * dt;
 }
 
-/*!\brief intercepte l'événement clavier pour modifier les options (à l'appuie d'une touche). */
+/*!\brief Intercepte l'événement clavier pour modifier les options (à l'appuie d'une touche). */
 void keyd(int keycode) {
     switch(keycode) {
         /* 'v' utiliser la sync Verticale */
@@ -305,7 +306,7 @@ void keyd(int keycode) {
     }
 }
 
-/*!\brief intercepte l'évènement clavier pour modifier les options (au relâchement d'une touche). */
+/*!\brief Intercepte l'évènement clavier pour modifier les options (au relâchement d'une touche). */
 void keyu(int keycode) {
     switch(keycode) {
         /* Cas où l'héros A on arrête de bouger */
@@ -347,7 +348,8 @@ void keyu(int keycode) {
     }
 }
 
-/*!\brief à appeler à la sortie du programme. */
+/*!\brief Appeler à la sortie du programme
+ * pour libérer les objets de la mémoire. */
 void sortie(void) {
     /* on libère le cube */
     if(_cube) {
