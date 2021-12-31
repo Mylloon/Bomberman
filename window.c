@@ -49,8 +49,8 @@ typedef struct perso_t {
 } perso_t;
 
 /* Définition de nos deux joueurs */
-perso_t _herosA = { 6.f, 0.f, -6.f };
-perso_t _herosB = { -10.f, 0.f, 0.f };
+perso_t _herosA = { 6.f, 0.f, -6.f }; // à droite
+perso_t _herosB = { -10.f, 0.f, 0.f }; // à gauche
 
 /* clavier virtuel */
 enum {
@@ -144,33 +144,39 @@ void idle(void) {
     // pour le frame d'après, je mets à jour t0
     t0 = t;
 
-    int ligne, colonne;
-
     /* Mouvements du héros A */
+    float zA = (float)((_herosA.z + _cubeSize * _grilleH / 2) / _cubeSize);
+    float xA = (float)((_herosA.x + _cubeSize * _grilleW / 2) / _cubeSize);
     if(_vkeyboard[VK_RIGHT])
-        _herosA.x += 10.f * dt;
-    if(_vkeyboard[VK_UP])
-        _herosA.z -= 10.f * dt;
-    if(_vkeyboard[VK_LEFT])
-        _herosA.x -= 10.f * dt;
-    if(_vkeyboard[VK_DOWN])
-        _herosA.z += 10.f * dt;
-    ligne  = (int)((_herosA.z + _cubeSize * _grilleH / 2) / _cubeSize);
-    colonne = (int)((_herosA.x + _cubeSize * _grilleW / 2) / _cubeSize);
-    printf("\n==Héros A==\nli = %d, col = %d\n===========\n", ligne, colonne);
+        if(xA < (_grilleW - 2)) // collision à droite du plateau
+            _herosA.x += 10.f * dt;
+    if(_vkeyboard[VK_UP]) // collision en haut plateau
+        if(zA > 1.f)
+            _herosA.z -= 10.f * dt;
+    if(_vkeyboard[VK_LEFT]) // collision à gauche du plateau
+        if(xA > 1.f)
+            _herosA.x -= 10.f * dt;
+    if(_vkeyboard[VK_DOWN]) // collision en bas du plateau
+        if(zA < (_grilleH - 2))
+            _herosA.z += 10.f * dt;
+    printf("\n==Héros A==\nli = %f, col = %f\n===========\n", zA, xA);
 
     /* Mouvements du héros B */
+    float zB = (float)((_herosB.z + _cubeSize * _grilleH / 2) / _cubeSize);
+    float xB = (float)((_herosB.x + _cubeSize * _grilleW / 2) / _cubeSize);
     if(_vkeyboard[VK_d])
-        _herosB.x += 10.f * dt;
-    if(_vkeyboard[VK_z])
-        _herosB.z -= 10.f * dt;
-    if(_vkeyboard[VK_q])
-        _herosB.x -= 10.f * dt;
-    if(_vkeyboard[VK_s])
-        _herosB.z += 10.f * dt;
-    ligne  = (int)((_herosB.z + _cubeSize * _grilleH / 2) / _cubeSize);
-    colonne = (int)((_herosB.x + _cubeSize * _grilleW / 2) / _cubeSize);
-    printf("==Héros B==\nli = %d, col = %d\n===========\n", ligne, colonne);
+        if(xB < (_grilleW - 2)) // collision à droite du plateau
+            _herosB.x += 10.f * dt;
+    if(_vkeyboard[VK_z]) // collision en haut plateau
+        if(zB > 1.f)
+            _herosB.z -= 10.f * dt;
+    if(_vkeyboard[VK_q]) // collision à gauche du plateau
+        if(xB > 1.f)
+            _herosB.x -= 10.f * dt;
+    if(_vkeyboard[VK_s]) // collision en bas du plateau
+        if(zB < (_grilleH - 2))
+            _herosB.z += 10.f * dt;
+    printf("==Héros B==\nli = %f, col = %f\n===========\n", zB, xB);
 }
 
 /*!\brief la fonction appelée à chaque display. */
