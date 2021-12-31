@@ -27,8 +27,8 @@ static void sortie(void);
 static surface_t * _cube = NULL;
 static float _cubeSize = 4.0f;
 
-/* des variable d'états pour activer/désactiver des options de rendu */
-static int _use_tex = 1, _use_color = 1, _use_lighting = 1;
+/* variable d'état pour activer/désactiver la synchronisation verticale */
+static int _use_vsync = 1;
 
 /* on créé une grille de positions où il y aura des cubes */
 static int _grille[] = {
@@ -102,9 +102,6 @@ void init(void) {
      * textures */
     gl4dpInitScreen();
 
-    /* Pour forcer la désactivation de la synchronisation verticale */
-    // SDL_GL_SetSwapInterval(0);
-
     /* on créé le cube */
     _cube = mk_cube(); /* ça fait 2x6 triangles      */
 
@@ -112,13 +109,9 @@ void init(void) {
     id = get_texture_from_BMP("images/tex.bmp");
     set_texture_id(_cube, id);
 
-    /* si _use_tex != 0, on active l'utilisation de la texture */
-    if(_use_tex)
-        enable_surface_option(  _cube, SO_USE_TEXTURE);
-
-    /* si _use_lighting != 0, on active l'ombrage */
-    if(_use_lighting)
-        enable_surface_option(  _cube, SO_USE_LIGHTING);
+    /* si _use_vsync != 0, on active la synchronisation verticale */
+    if(_use_vsync)
+        SDL_GL_SetSwapInterval(1);
 
     /* mettre en place la fonction à appeler en cas de sortie */
     atexit(sortie);
@@ -214,28 +207,12 @@ void draw(void) {
 /*!\brief intercepte l'événement clavier pour modifier les options (à l'appuie d'une touche). */
 void keyd(int keycode) {
     switch(keycode) {
-        case GL4DK_t: /* 't' la texture */
-            _use_tex = !_use_tex;
-            if(_use_tex)
-                enable_surface_option(  _cube, SO_USE_TEXTURE);
+        case GL4DK_v: /* 'v' utiliser la sync Verticale */
+            _use_vsync = !_use_vsync;
+            if(_use_vsync)
+                SDL_GL_SetSwapInterval(1);
             else
-                disable_surface_option(  _cube, SO_USE_TEXTURE);
-            break;
-
-        case GL4DK_c: /* 'c' utiliser la couleur */
-            _use_color = !_use_color;
-            if(_use_color)
-                enable_surface_option(  _cube, SO_USE_COLOR);
-            else
-                disable_surface_option(  _cube, SO_USE_COLOR);
-            break;
-
-        case GL4DK_l: /* 'l' utiliser l'ombrage par la mÃ©thode Gouraud */
-            _use_lighting = !_use_lighting;
-            if(_use_lighting)
-                enable_surface_option(  _cube, SO_USE_LIGHTING);
-            else
-                disable_surface_option(  _cube, SO_USE_LIGHTING);
+                SDL_GL_SetSwapInterval(0);
             break;
 
         case GL4DK_RIGHT:
