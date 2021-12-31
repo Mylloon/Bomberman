@@ -49,8 +49,8 @@ typedef struct perso_t {
 } perso_t;
 
 /* Définition de nos deux joueurs */
-perso_t _herosA = { -10.f, 0.f, 0.f };
-perso_t _herosB = { 6.f, 0.f, -6.f };
+perso_t _herosA = { 6.f, 0.f, -6.f };
+perso_t _herosB = { -10.f, 0.f, 0.f };
 
 /* clavier virtuel */
 enum {
