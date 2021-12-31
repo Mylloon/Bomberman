@@ -93,11 +93,9 @@ int main(int argc, char ** argv) {
     return 0;
 }
 
-/*!\brief init de nos données, spécialement les trois surfaces
- * utilisées dans ce code */
+/*!\brief init de nos données, spécialement le plateau */
 void init(void) {
     GLuint id;
-    vec4 r = {1, 0, 0, 1}, g = {0, 1, 0, 1}, b = {0, 0, 1, 1};
     /* création d'un screen GL4Dummies (texture dans laquelle nous
      * pouvons dessiner) aux dimensions de la fenêtre.  IMPORTANT de
      * créer le screen avant d'utiliser les fonctions liées au
@@ -105,13 +103,10 @@ void init(void) {
     gl4dpInitScreen();
 
     /* Pour forcer la désactivation de la synchronisation verticale */
-    SDL_GL_SetSwapInterval(0);
+    // SDL_GL_SetSwapInterval(0);
 
     /* on créé le cube */
-    _cube = mk_cube();         /* ça fait 2x6 triangles      */
-
-    /* on change la couleur */
-    _cube->dcolor = b;
+    _cube = mk_cube(); /* ça fait 2x6 triangles      */
 
     /* on rajoute la texture */
     id = get_texture_from_BMP("images/tex.bmp");
@@ -140,23 +135,19 @@ void idle(void) {
     t0 = t;
 
     if(_vkeyboard[VK_RIGHT])
-        _hero.x += 2.0f * dt;
+        _hero.x += 10.f * dt;
     if(_vkeyboard[VK_UP])
-        _hero.z -= 2.0f * dt;
+        _hero.z -= 10.f * dt;
     if(_vkeyboard[VK_LEFT])
-        _hero.x -= 2.0f * dt;
+        _hero.x -= 10.f * dt;
     if(_vkeyboard[VK_DOWN])
-        _hero.z += 2.0f * dt;
+        _hero.z += 10.f * dt;
 
-    int li, col;
-    col = (int)((_hero.x + _cubeSize * _grilleW /2) / _cubeSize);
-    li  = (int)((_hero.z + _cubeSize * _grilleH /2) / _cubeSize);
-    printf("col = %d, li = %d\n", col, li);
 }
 
 /*!\brief la fonction appelée à chaque display. */
 void draw(void) {
-    vec4 r = {1, 0, 0, 1}, b = {0, 0, 1, 1};
+    vec4 couleurPlateau = {0.20, 0.20, 0.20, 1}, g = {0, 1, 0, 1}, b = {0, 0, 1, 1};
 
     /* on va récupérer le delta-temps */
     static double t0 = 0.0; // le temps à la frame précédente
@@ -188,7 +179,7 @@ void draw(void) {
     float cZ = -_cubeSize * _grilleH / 2.0f;
 
     /* on change la couleur */
-    _cube->dcolor = b;
+    _cube->dcolor = couleurPlateau;
 
     /* pour toutes les cases de la grille, afficher un cube quand il y a
      * un 1 dans la grille */
@@ -206,7 +197,7 @@ void draw(void) {
 
     /* on dessine le perso _hero */
     /* on change la couleur */
-    _cube->dcolor = r;
+    _cube->dcolor = g;
     memcpy(nmv, model_view_matrix, sizeof nmv);
     translate(nmv, _hero.x, _hero.y, _hero.z);
     scale(nmv, _cubeSize / 2.0f, _cubeSize / 2.0f, _cubeSize / 2.0f);
