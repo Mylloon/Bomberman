@@ -32,7 +32,7 @@ git clone https://code.up8.edu/Anri/bomberman.git bomberman-akennel
 ```
 
 ## Build & lancer le jeu
-Pour build le jeu (vous aurez besoin de [GL4Dummies](https://github.com/noalien/GL4Dummies) et ces [dépendances](https://github.com/noalien/GL4Dummies#dependencies)) :
+Pour build le jeu (vous aurez besoin de [GL4Dummies](https://github.com/noalien/GL4Dummies) et ces [dépendances](https://github.com/noalien/GL4Dummies#dependencies)) [[ici un script](https://git.kennel.ml/Anri/myLinuxConfiguration/raw/branch/main/installgl4D.sh) pour installer GL4D tout seul]:
 ```bash
 make
 ```
