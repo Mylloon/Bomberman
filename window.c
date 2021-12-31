@@ -168,7 +168,7 @@ void idle(void) {
 
 /*!\brief la fonction appelée à chaque display. */
 void draw(void) {
-    vec4 couleurPlateau = {0.20, 0.20, 0.20, 1}, g = {0, 1, 0, 1}, b = {0, 0, 1, 1};
+    vec4 couleurPlateau = {0.2, 0.2, 0.2, 1} /* Gris */, couleurHerosA = {0.15, 0.5, 0.15, 1} /* Vert */, couleurHerosB = {0.2, 0.2, 0.7, 1} /* Bleu */;
 
     /* on va récupérer le delta-temps */
     static double t0 = 0.0; // le temps à la frame précédente
@@ -217,14 +217,14 @@ void draw(void) {
             }
 
     /* on dessine le héros A */
-    _cube->dcolor = g;
+    _cube->dcolor = couleurHerosA;
     memcpy(nmv, model_view_matrix, sizeof nmv);
     translate(nmv, _herosA.x, _herosA.y, _herosA.z);
     scale(nmv, _cubeSize / 2.0f, _cubeSize / 2.0f, _cubeSize / 2.0f);
     transform_n_rasterize(_cube, nmv, projection_matrix);
 
     /* on dessine le héros B */
-    _cube->dcolor = b;
+    _cube->dcolor = couleurHerosB;
     memcpy(nmv, model_view_matrix, sizeof nmv);
     translate(nmv, _herosB.x, _herosB.y, _herosB.z);
     scale(nmv, _cubeSize / 2.0f, _cubeSize / 2.0f, _cubeSize / 2.0f);
