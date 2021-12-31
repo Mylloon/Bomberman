@@ -159,7 +159,7 @@ void idle(void) {
     if(_vkeyboard[VK_DOWN]) // collision en bas du plateau
         if(zA < (_grilleH - 2))
             _herosA.z += 10.f * dt;
-    printf("\n==Héros A==\nli = %f, col = %f\n===========\n", zA, xA);
+    printf("\n========== Héros A ==========\nli = %f, col = %f\n", zA, xA);
 
     /* Mouvements du héros B */
     float zB = (float)((_herosB.z + _cubeSize * _grilleH / 2) / _cubeSize);
@@ -176,7 +176,7 @@ void idle(void) {
     if(_vkeyboard[VK_s]) // collision en bas du plateau
         if(zB < (_grilleH - 2))
             _herosB.z += 10.f * dt;
-    printf("==Héros B==\nli = %f, col = %f\n===========\n", zB, xB);
+    printf("========== Héros B ==========\nli = %f, col = %f\n=============================\n", zB, xB);
 }
 
 /*!\brief la fonction appelée à chaque display. */
