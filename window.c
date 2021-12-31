@@ -127,8 +127,7 @@ void init(void) {
     enable_surface_option(_cube, SO_USE_LIGHTING);
 
     /* si _use_vsync != 0, on active la synchronisation verticale */
-    if(_use_vsync)
-        SDL_GL_SetSwapInterval(1);
+    SDL_GL_SetSwapInterval(_use_vsync);
 
     /* mettre en place la fonction à appeler en cas de sortie */
     atexit(sortie);
