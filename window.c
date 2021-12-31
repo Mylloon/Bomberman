@@ -49,8 +49,8 @@ typedef struct perso_t {
 } perso_t;
 
 /* Définition de nos deux joueurs */
-perso_t _herosA = { -10.0f, 0.0f, 0.0f };
-perso_t _herosB = { 10.0f, 0.0f, 0.0f };
+perso_t _herosA = { -10.f, 0.f, 0.f };
+perso_t _herosB = { 6.f, 0.f, -6.f };
 
 /* clavier virtuel */
 enum {
@@ -144,6 +144,8 @@ void idle(void) {
     // pour le frame d'après, je mets à jour t0
     t0 = t;
 
+    int ligne, colonne;
+
     /* Mouvements du héros A */
     if(_vkeyboard[VK_RIGHT])
         _herosA.x += 10.f * dt;
@@ -153,6 +155,9 @@ void idle(void) {
         _herosA.x -= 10.f * dt;
     if(_vkeyboard[VK_DOWN])
         _herosA.z += 10.f * dt;
+    ligne  = (int)((_herosA.z + _cubeSize * _grilleH / 2) / _cubeSize);
+    colonne = (int)((_herosA.x + _cubeSize * _grilleW / 2) / _cubeSize);
+    printf("\n==Héros A==\nli = %d, col = %d\n===========\n", ligne, colonne);
 
     /* Mouvements du héros B */
     if(_vkeyboard[VK_d])
@@ -163,7 +168,9 @@ void idle(void) {
         _herosB.x -= 10.f * dt;
     if(_vkeyboard[VK_s])
         _herosB.z += 10.f * dt;
-
+    ligne  = (int)((_herosB.z + _cubeSize * _grilleH / 2) / _cubeSize);
+    colonne = (int)((_herosB.x + _cubeSize * _grilleW / 2) / _cubeSize);
+    printf("==Héros B==\nli = %d, col = %d\n===========\n", ligne, colonne);
 }
 
 /*!\brief la fonction appelée à chaque display. */
