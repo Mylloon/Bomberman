@@ -47,19 +47,30 @@ static int _grilleH = 7;
 typedef struct perso_t {
   float x, y, z;
 } perso_t;
-perso_t _hero = { -10.0f, 0.0f, 0.0f };
+
+/* Définition de nos deux joueurs */
+perso_t _herosA = { -10.0f, 0.0f, 0.0f };
+perso_t _herosB = { 10.0f, 0.0f, 0.0f };
 
 /* clavier virtuel */
 enum {
-  VK_RIGHT = 0,
-  VK_UP,
-  VK_LEFT,
-  VK_DOWN,
-  /* toujours à la fin */
-  VK_SIZEOF
+    /* Héros A */
+    VK_RIGHT = 0,
+    VK_UP,
+    VK_LEFT,
+    VK_DOWN,
+
+    /* Héros B */
+    VK_d,
+    VK_z,
+    VK_q,
+    VK_s,
+
+    /* toujours à la fin */
+    VK_SIZEOF
 };
 
-int _vkeyboard[VK_SIZEOF] = {0, 0, 0, 0};
+int _vkeyboard[VK_SIZEOF] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 /*!\brief paramètre l'application et lance la boucle infinie. */
 int main(int argc, char ** argv) {
@@ -109,6 +120,12 @@ void init(void) {
     id = get_texture_from_BMP("images/tex.bmp");
     set_texture_id(_cube, id);
 
+    /* Affichage des textures */
+    enable_surface_option(_cube, SO_USE_TEXTURE);
+
+    /* Affichage des ombres */
+    enable_surface_option(_cube, SO_USE_LIGHTING);
+
     /* si _use_vsync != 0, on active la synchronisation verticale */
     if(_use_vsync)
         SDL_GL_SetSwapInterval(1);
@@ -127,14 +144,25 @@ void idle(void) {
     // pour le frame d'après, je mets à jour t0
     t0 = t;
 
+    /* Mouvements du héros A */
     if(_vkeyboard[VK_RIGHT])
-        _hero.x += 10.f * dt;
+        _herosA.x += 10.f * dt;
     if(_vkeyboard[VK_UP])
-        _hero.z -= 10.f * dt;
+        _herosA.z -= 10.f * dt;
     if(_vkeyboard[VK_LEFT])
-        _hero.x -= 10.f * dt;
+        _herosA.x -= 10.f * dt;
     if(_vkeyboard[VK_DOWN])
-        _hero.z += 10.f * dt;
+        _herosA.z += 10.f * dt;
+
+    /* Mouvements du héros B */
+    if(_vkeyboard[VK_d])
+        _herosB.x += 10.f * dt;
+    if(_vkeyboard[VK_z])
+        _herosB.z -= 10.f * dt;
+    if(_vkeyboard[VK_q])
+        _herosB.x -= 10.f * dt;
+    if(_vkeyboard[VK_s])
+        _herosB.z += 10.f * dt;
 
 }
 
@@ -188,11 +216,17 @@ void draw(void) {
                 transform_n_rasterize(_cube, nmv, projection_matrix);
             }
 
-    /* on dessine le perso _hero */
-    /* on change la couleur */
+    /* on dessine le héros A */
     _cube->dcolor = g;
     memcpy(nmv, model_view_matrix, sizeof nmv);
-    translate(nmv, _hero.x, _hero.y, _hero.z);
+    translate(nmv, _herosA.x, _herosA.y, _herosA.z);
+    scale(nmv, _cubeSize / 2.0f, _cubeSize / 2.0f, _cubeSize / 2.0f);
+    transform_n_rasterize(_cube, nmv, projection_matrix);
+
+    /* on dessine le héros B */
+    _cube->dcolor = b;
+    memcpy(nmv, model_view_matrix, sizeof nmv);
+    translate(nmv, _herosB.x, _herosB.y, _herosB.z);
     scale(nmv, _cubeSize / 2.0f, _cubeSize / 2.0f, _cubeSize / 2.0f);
     transform_n_rasterize(_cube, nmv, projection_matrix);
 
@@ -207,7 +241,8 @@ void draw(void) {
 /*!\brief intercepte l'événement clavier pour modifier les options (à l'appuie d'une touche). */
 void keyd(int keycode) {
     switch(keycode) {
-        case GL4DK_v: /* 'v' utiliser la sync Verticale */
+        /* 'v' utiliser la sync Verticale */
+        case GL4DK_v:
             _use_vsync = !_use_vsync;
             if(_use_vsync)
                 SDL_GL_SetSwapInterval(1);
@@ -215,6 +250,7 @@ void keyd(int keycode) {
                 SDL_GL_SetSwapInterval(0);
             break;
 
+        /* Héros A */
         case GL4DK_RIGHT:
             _vkeyboard[VK_RIGHT] = 1;
             break;
@@ -231,14 +267,32 @@ void keyd(int keycode) {
             _vkeyboard[VK_DOWN] = 1;
             break;
 
-        default: break; // par défaut ne fais rien
+        /* Héros B */
+        case GL4DK_d:
+            _vkeyboard[VK_d] = 1;
+            break;
+
+        case GL4DK_z:
+            _vkeyboard[VK_z] = 1;
+            break;
+
+        case GL4DK_q:
+            _vkeyboard[VK_q] = 1;
+            break;
+
+        case GL4DK_s:
+            _vkeyboard[VK_s] = 1;
+            break;
+
+        /* Par défaut on ne fais rien */
+        default: break;
     }
 }
 
 /*!\brief intercepte l'évènement clavier pour modifier les options (au relâchement d'une touche). */
 void keyu(int keycode) {
     switch(keycode) {
-        /* Cas où on arrête de bouger */
+        /* Cas où l'héros A on arrête de bouger */
         case GL4DK_RIGHT:
             _vkeyboard[VK_RIGHT] = 0;
             break;
@@ -255,7 +309,25 @@ void keyu(int keycode) {
             _vkeyboard[VK_DOWN] = 0;
             break;
 
-        default: break; // par défaut on ne fais rien
+        /* Cas où l'héros A on arrête de bouger */
+        case GL4DK_d:
+            _vkeyboard[VK_d] = 0;
+            break;
+
+        case GL4DK_z:
+            _vkeyboard[VK_z] = 0;
+            break;
+
+        case GL4DK_q:
+            _vkeyboard[VK_q] = 0;
+            break;
+
+        case GL4DK_s:
+            _vkeyboard[VK_s] = 0;
+            break;
+
+        /* Par défaut on ne fais rien */
+        default: break;
     }
 }
 
