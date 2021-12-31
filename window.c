@@ -28,7 +28,7 @@ static void sortie(void);
 
 /*!\brief Surface représentant un cube */
 static surface_t * _cube = NULL;
-static float _cubeSize = 4.0f;
+static float _cubeSize = 4.f;
 
 /* Variable d'état pour activer/désactiver la synchronisation verticale */
 static int _use_vsync = 1;
@@ -146,41 +146,40 @@ void idle(void) {
     /* pour le frame d'après, mets à-jour t0 */
     t0 = t;
 
+    float vitesse = 10.f;
     /* Mouvements du héros A */
     float zA = (float)((_herosA.z + _cubeSize * _grilleH / 2) / _cubeSize); // ligne - hauteur
     float xA = (float)((_herosA.x + _cubeSize * _grilleW / 2) / _cubeSize); // colonne - longueur
-    int positionA = (int)(zA + .5f) * _grilleH + (int)(xA + .5f); // position dans la grille
     if(_vkeyboard[VK_RIGHT])
-        if(xA < (_grilleW - 2)) // collision à droite du plateau
-            _herosA.x += 10.f * dt;
-    if(_vkeyboard[VK_UP]) // collision en haut plateau
-        if(zA > 1.f)
-            _herosA.z -= 10.f * dt;
-    if(_vkeyboard[VK_LEFT]) // collision à gauche du plateau
-        if(xA > 1.f)
-            _herosA.x -= 10.f * dt;
-    if(_vkeyboard[VK_DOWN]) // collision en bas du plateau
-        if(zA < (_grilleH - 2))
-            _herosA.z += 10.f * dt;
-    printf("\n=============== Héros A ===============\nli = %f, col = %f, pos = %d\n", zA, xA, positionA);
+        if(_grille[(int)(zA + .5f) * _grilleH + (int)(xA + 1.f)] == 0) // collision à droite du plateau
+            _herosA.x += vitesse * dt;
+    if(_vkeyboard[VK_UP])
+        if(_grille[(int)zA * _grilleH + (int)(xA + .5f)] == 0) // collision en haut plateau
+            _herosA.z -= vitesse * dt;
+    if(_vkeyboard[VK_LEFT])
+        if(_grille[(int)(zA + .5f) * _grilleH + (int)xA] == 0) // collision à gauche du plateau
+            _herosA.x -= vitesse * dt;
+    if(_vkeyboard[VK_DOWN])
+        if(_grille[(int)(zA + 1.f) * _grilleH + (int)(xA + .5f)] == 0) // collision en bas du plateau
+            _herosA.z += vitesse * dt;
+    printf("\n=========== Héros A ===========\n li = %d, col = %d\n", (int)(zA + .5f), (int)(xA + .5f));
 
     /* Mouvements du héros B */
     float zB = (float)((_herosB.z + _cubeSize * _grilleH / 2) / _cubeSize); // ligne - hauteur
     float xB = (float)((_herosB.x + _cubeSize * _grilleW / 2) / _cubeSize); // colonne - longueur
-    int positionB = (int)(zB + .5f) * _grilleH + (int)(xB + .5f); // position dans la grille
     if(_vkeyboard[VK_d])
-        if(xB < (_grilleW - 2)) // collision à droite du plateau
-            _herosB.x += 10.f * dt;
-    if(_vkeyboard[VK_z]) // collision en haut plateau
-        if(zB > 1.f)
-            _herosB.z -= 10.f * dt;
-    if(_vkeyboard[VK_q]) // collision à gauche du plateau
-        if(xB > 1.f)
-            _herosB.x -= 10.f * dt;
-    if(_vkeyboard[VK_s]) // collision en bas du plateau
-        if(zB < (_grilleH - 2))
-            _herosB.z += 10.f * dt;
-    printf("=============== Héros B ===============\nli = %f, col = %f, pos = %d\n=======================================\n", zB, xB, positionB);
+        if(_grille[(int)(zB + .5f) * _grilleH + (int)(xB + 1.f)] == 0) // collision à droite du plateau
+            _herosB.x += vitesse * dt;
+    if(_vkeyboard[VK_z])
+        if(_grille[(int)zB * _grilleH + (int)(xB + .5f)] == 0) // collision en haut plateau
+            _herosB.z -= vitesse * dt;
+    if(_vkeyboard[VK_q])
+        if(_grille[(int)(zB + .5f) * _grilleH + (int)xB] == 0) // collision à gauche du plateau
+            _herosB.x -= vitesse * dt;
+    if(_vkeyboard[VK_s])
+        if(_grille[(int)(zB + 1.f) * _grilleH + (int)(xB + .5f)] == 0) // collision en bas du plateau
+            _herosB.z += vitesse * dt;
+    printf("=========== Héros B ===========\n li = %d, col = %d\n===============================\n", (int)(zB + .5f), (int)(xB + .5f));
 }
 
 /*!\brief Fonction appelée à chaque display. */
