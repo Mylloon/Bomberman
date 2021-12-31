@@ -13,7 +13,7 @@
 #include "rasterize.h"
 #include <assert.h>
 
-/* bloc de fonctions locales (static) */
+/* Fonctions locales (static) */
 static inline void    fill_triangle(surface_t * s, triangle_t * t);
 static inline void    abscisses(surface_t * s, vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace);
 static inline void    horizontal_line(surface_t * s, vertex_t * vG, vertex_t * vD);
@@ -35,22 +35,22 @@ static inline GLubyte blue(GLuint c);
 static inline GLubyte alpha(GLuint c);
 static        void    pquit(void);
 
-/*!\brief la texture courante à utiliser en cas de mapping de texture */
+/*!\brief Texture courante à utiliser en cas de mapping de texture */
 static GLuint * _tex = NULL;
-/*!\brief la largeur de la texture courante à utiliser en cas de
+/*!\brief Largeur de la texture courante à utiliser en cas de
  * mapping de texture */
 static GLuint _texW = 0;
-/*!\brief la hauteur de la texture courante à utiliser en cas de
+/*!\brief Hauteur de la texture courante à utiliser en cas de
  * mapping de texture */
 static GLuint _texH = 0;
-/*!\brief un buffer de depth pour faire le z-test */
+/*!\brief Buffer de prodondeur pour faire le z-test */
 static float * _depth = NULL;
-/*!\brief flag pour savoir s'il faut ou non corriger l'interpolation
+/*!\brief Flag pour savoir s'il faut ou non corriger l'interpolation
  * par rapport à la profondeur en cas de projection en
  * perspective */
 static int _perpective_correction = 0;
 
-/*!\brief transforme et rastérise l'ensemble des triangles de la
+/*!\brief Transforme et rastérise l'ensemble des triangles de la
  * surface. */
 void transform_n_rasterize(surface_t * s, float * model_view_matrix, float * projection_matrix) {
     int i;
@@ -61,7 +61,7 @@ void transform_n_rasterize(surface_t * s, float * model_view_matrix, float * pro
         atexit(pquit);
     }
     /* si projection_matrix[15] est à 1, c'est une projection orthogonale, pas
-    * besoin de correction de perspective */
+     * besoin de correction de perspective */
     _perpective_correction = projection_matrix[15] == 1.0f ? 0 : 1;
     /* le viewport est fixe ; \todo peut devenir paramétrable ... */
     float viewport[] = { 0.0f, 0.0f, (float)gl4dpGetWidth(), (float)gl4dpGetHeight() };
@@ -75,9 +75,9 @@ void transform_n_rasterize(surface_t * s, float * model_view_matrix, float * pro
         /* on rejette aussi les triangles complètement out */
         if(s->t[i].state & PS_TOTALLY_OUT) continue;
         /* "hack" pas terrible permettant de rejeter les triangles
-        * partiellement out dont au moins un sommet est TOO_FAR (trop
-        * éloigné). Voir le fichier transformations.c pour voir comment
-        * améliorer ce traitement. */
+         * partiellement out dont au moins un sommet est TOO_FAR (trop
+         * éloigné). Voir le fichier transformations.c pour voir comment
+         * améliorer ce traitement. */
         if( s->t[i].state & PS_PARTIALLY_OUT    &&
             ( (s->t[i].v[0].state & PS_TOO_FAR) ||
             (s->t[i].v[1].state & PS_TOO_FAR)   ||
@@ -88,7 +88,7 @@ void transform_n_rasterize(surface_t * s, float * model_view_matrix, float * pro
     }
 }
 
-/*!\brief effacer le buffer de profondeur (à chaque frame) pour
+/*!\brief Efface le buffer de profondeur (à chaque frame) pour
  * réaliser le z-test */
 void clear_depth_map(void) {
     if(_depth) {
@@ -96,7 +96,7 @@ void clear_depth_map(void) {
     }
 }
 
-/*!\brief met en place une texture pour être mappée sur la surface en cours */
+/*!\brief Met en place une texture pour être mappée sur la surface en cours */
 void set_texture(GLuint screen) {
     GLuint old_id = gl4dpGetTextureId(); /* au cas où */
     gl4dpSetScreen(screen);
@@ -108,7 +108,7 @@ void set_texture(GLuint screen) {
 }
 
 
-/*!\brief met à jour la fonction d'interpolation et de coloriage
+/*!\brief Met-à-jour la fonction d'interpolation et de coloriage
  * (shadingfunc) de la surface en fonction de ses options */
 void updatesfuncs(surface_t * s) {
     int t;
@@ -121,10 +121,9 @@ void updatesfuncs(surface_t * s) {
     }
 }
 
-/*!\brief fonction principale de ce fichier, elle dessine un triangle
- * rempli à l'écran en calculant l'ensemble des gradients
- * (interpolations bilinaires des attributs du sommet).
- */
+/*!\brief Dessine un triangle et le rempli en calculant l'ensemble
+ * des gradients avec interpolations bilinaires des attributs du sommet
+ * (fonction principale de ce fichier) */
 inline void fill_triangle(surface_t * s, triangle_t * t) {
     vertex_t * aG = NULL, * aD = NULL;
     int bas, median, haut, n, signe, i, h = gl4dpGetHeight();
@@ -196,9 +195,8 @@ inline void fill_triangle(surface_t * s, triangle_t * t) {
     free(aD);
 }
 
-/*!\brief utilise Br'65 pour determiner les abscisses des segments du
- * triangle à remplir (par \a horizontal_line).
- */
+/*!\brief Utilise Br'65 pour determiner les abscisses des segments du
+ * triangle à remplir (par \a horizontal_line). */
 inline void abscisses(surface_t * s, vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
     int u = p1->x - p0->x, v = p1->y - p0->y, pasX = u < 0 ? -1 : 1, pasY = v < 0 ? -1 : 1;
     float dmax = sqrtf(u * u + v * v), p;
@@ -257,7 +255,7 @@ inline void abscisses(surface_t * s, vertex_t * p0, vertex_t * p1, vertex_t * ab
     }
 }
 
-/*!\brief remplissage par droite horizontale entre deux abscisses */
+/*!\brief Remplissage par droite horizontale entre deux abscisses */
 inline void horizontal_line(surface_t * s, vertex_t * vG, vertex_t * vD) {
     int w = gl4dpGetWidth(), x, yw = vG->y * w;
     GLuint * image = gl4dpGetPixels();
@@ -272,12 +270,12 @@ inline void horizontal_line(surface_t * s, vertex_t * vG, vertex_t * vD) {
             _depth[yw + x] = v.z;
         }
 }
-/*!\brief aucune couleur n'est inscrite */
+/*!\brief Aucune couleur n'est inscrite */
 inline void shading_none(surface_t * s, GLuint * pcolor, vertex_t * v) {
-    //vide pour l'instant, à prévoir le z-buffer
+    // vide pour l'instant, à prévoir le z-buffer
 }
 
-/*!\brief la couleur du pixel est tirée uniquement de la texture */
+/*!\brief Couleur du pixel tirée uniquement de la texture */
 inline void shading_only_tex(surface_t * s, GLuint * pcolor, vertex_t * v) {
     int xt, yt, ct;
     GLubyte r, g, b, a;
@@ -302,7 +300,7 @@ inline void shading_only_tex(surface_t * s, GLuint * pcolor, vertex_t * v) {
     *pcolor = rgba(r, g, b, a);
 }
 
-/*!\brief la couleur du pixel est tirée de la couleur interpolée */
+/*!\brief Couleur du pixel tirée de la couleur interpolée */
 inline void shading_only_color_CM(surface_t * s, GLuint * pcolor, vertex_t * v) {
     GLubyte r, g, b, a;
     r = (GLubyte)(v->li * v->icolor.x * (255 + EPSILON));
@@ -312,7 +310,7 @@ inline void shading_only_color_CM(surface_t * s, GLuint * pcolor, vertex_t * v) 
     *pcolor = rgba(r, g, b, a);
 }
 
-/*!\brief la couleur du pixel est tirée de la couleur diffuse de la
+/*!\brief Couleur du pixel tirée de la couleur diffuse de la
  * surface */
 inline void shading_only_color(surface_t * s, GLuint * pcolor, vertex_t * v) {
     GLubyte r, g, b, a;
@@ -323,7 +321,7 @@ inline void shading_only_color(surface_t * s, GLuint * pcolor, vertex_t * v) {
     *pcolor = rgba(r, g, b, a);
 }
 
-/*!\brief la couleur du pixel est le produit de la couleur interpolée
+/*!\brief Couleur du pixel = produit de la couleur interpolée
  * et de la texture */
 inline void shading_all_CM(surface_t * s, GLuint * pcolor, vertex_t * v) {
     GLubyte r, g, b, a;
@@ -348,7 +346,7 @@ inline void shading_all_CM(surface_t * s, GLuint * pcolor, vertex_t * v) {
     *pcolor = rgba(r, g, b, a);
 }
 
-/*!\brief la couleur du pixel est le produit de la couleur diffuse
+/*!\brief Couleur du pixel = produit de la couleur diffuse
  * de la surface et de la texture */
 inline void shading_all(surface_t * s, GLuint * pcolor, vertex_t * v) {
     GLubyte r, g, b, a;
@@ -373,7 +371,7 @@ inline void shading_all(surface_t * s, GLuint * pcolor, vertex_t * v) {
     *pcolor = rgba(r, g, b, a);
 }
 
-/*!\brief interpolation de plusieurs floattants (entre \a s et \a e)
+/*!\brief Interpolation de plusieurs floattants (entre \a s et \a e)
  * de la structure vertex_t en utilisant \a a et \a b, les
  * facteurs \a fa et \a fb, le tout dans \a r
  * \todo un pointeur de fonction pour éviter un test s'il faut
@@ -383,7 +381,7 @@ inline void interpolate(vertex_t * r, vertex_t * a, vertex_t * b, float fa, floa
     float * pr = (float *)&(r->texCoord);
     float * pa = (float *)&(a->texCoord);
     float * pb = (float *)&(b->texCoord);
-    /* Correction de l'interpolation par rapport à la perspective, le z
+    /* correction de l'interpolation par rapport à la perspective, le z
     * joue un rôle dans les distances, il est nécessaire de le
     * réintégrer en modifiant les facteurs de proportion.
     * lien utile : https://www.scratchapixel.com/lessons/3d-basic-rendering/rasterization-practical-implementation/perspective-correct-interpolation-vertex-attributes
@@ -400,26 +398,26 @@ inline void interpolate(vertex_t * r, vertex_t * a, vertex_t * b, float fa, floa
         pr[i] = fa * pa[i] + fb * pb[i];
 }
 
-/*!\brief meta-fonction pour appeler \a interpolate, demande
+/*!\brief Meta-fonction pour appeler \a interpolate, demande
  * uniquement l'interpolation des z */
 inline void metainterpolate_none(vertex_t * r, vertex_t * a, vertex_t * b, float fa, float fb) {
     interpolate(r, a, b, fa, fb, 6, 8);
 }
 
-/*!\brief meta-fonction pour appeler \a interpolate, demande
+/*!\brief Meta-fonction pour appeler \a interpolate, demande
  * uniquement l'interpolation des coord. de texture et les z */
 inline void metainterpolate_only_tex(vertex_t * r, vertex_t * a, vertex_t * b, float fa, float fb) {
     interpolate(r, a, b, fa, fb, 0, 1);
     interpolate(r, a, b, fa, fb, 6, 8);
 }
 
-/*!\brief meta-fonction pour appeler \a interpolate, demande
+/*!\brief Meta-fonction pour appeler \a interpolate, demande
  * uniquement l'interpolation des couleurs et les z */
 inline void metainterpolate_only_color(vertex_t * r, vertex_t * a, vertex_t * b, float fa, float fb) {
     interpolate(r, a, b, fa, fb, 2, 8);
 }
 
-/*!\brief meta-fonction pour appeler \a interpolate, demande
+/*!\brief Meta-fonction pour appeler \a interpolate, demande
  * l'interpolation de l'ensemble des attributs */
 inline void metainterpolate_all(vertex_t * r, vertex_t * a, vertex_t * b, float fa, float fb) {
     interpolate(r, a, b, fa, fb, 0, 8);
@@ -446,7 +444,7 @@ GLubyte alpha(GLuint c) {
 }
 
 
-/*!\brief au moment de quitter le programme désallouer la mémoire
+/*!\brief Désalloue la mémoire au moment de quitter le programme
  * utilisée pour _depth */
 void pquit(void) {
     if(_depth) {

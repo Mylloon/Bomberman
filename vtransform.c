@@ -13,10 +13,10 @@
 #include "rasterize.h"
 #include <assert.h>
 
-/* fonctions locale (static) */
+/* Fonctions locale (static) */
 static inline void clip2_unit_cube(triangle_t * t);
 
-/*!\brief projette le sommet \a v à l'écran (le \a viewport) selon la
+/*!\brief Projette le sommet \a v à l'écran (le \a viewport) selon la
    matrice de model-view \a model_view_matrix et de projection \a projection_matrix. \a
    ti_model_view_matrix est la transposée de l'inverse de la matrice \a model_view_matrix.*/
 vertex_t vtransform(surface_t * s, vertex_t v, float * model_view_matrix, float * ti_model_view_matrix, float * projection_matrix, float * viewport) {
@@ -37,13 +37,13 @@ vertex_t vtransform(surface_t * s, vertex_t v, float * model_view_matrix, float 
     if(r2.z < -dist) v.state |= PS_OUT_NEAR;
     if(r2.z >  dist) v.state |= PS_OUT_FAR;
     /* "hack" pas terrible permettant d'éviter les gros triangles
-        partiellement hors-champ. Modifier dist pour jouer sur la taille
-        (une fois projetés) des triangles qu'on laisse passer (plus c'est
-        gros plus c'est lent avec les gros triangles). La "vraie"
-        solution est obtenue en calculant l'intersection exacte entre le
-        triangle et le cube unitaire ; attention, ceci produit
-        potentiellement une nouvelle liste de triangles à chaque frame,
-        et les attributs des sommets doivent être recalculés. */
+     * partiellement hors-champ. Modifier dist pour jouer sur la taille
+     * (une fois projetés) des triangles qu'on laisse passer (plus c'est
+     * gros plus c'est lent avec les gros triangles). La "vraie"
+     * solution est obtenue en calculant l'intersection exacte entre le
+     * triangle et le cube unitaire ; attention, ceci produit
+     * potentiellement une nouvelle liste de triangles à chaque frame,
+     * et les attributs des sommets doivent être recalculés. */
     dist = 10.0f;
     if(r2.x < -dist || r2.x > dist || r2.y < -dist || r2.y > dist || r2.z < -dist || r2.z > dist) {
         v.state |= PS_TOO_FAR;
@@ -52,8 +52,8 @@ vertex_t vtransform(surface_t * s, vertex_t v, float * model_view_matrix, float 
     /* Gouraud */
     if(s->options & SO_USE_LIGHTING) {
         /* la lumière est positionnelle et fixe dans la scène. \todo dans
-        scene.c la rendre modifiable, voire aussi pouvoir la placer par
-        rapport aux objets (elle subirait la matrice modèle). */
+         * scene.c la rendre modifiable, voire aussi pouvoir la placer par
+         * rapport aux objets (elle subirait la matrice modèle). */
         const vec4 lp[1] = { {0.0f, 0.0f, 1.0f} };
         vec4 ld = {lp[0].x - r1.x, lp[0].y - r1.y, lp[0].z - r1.z, lp[0].w - r1.w};
         float n[4] = {v.normal.x, v.normal.y, v.normal.z, 0.0f}, res[4];
@@ -75,7 +75,7 @@ vertex_t vtransform(surface_t * s, vertex_t v, float * model_view_matrix, float 
     return v;
 }
 
-/*!\brief projette le triangle \a t à l'écran (\a W x \a H) selon la
+/*!\brief Projette le triangle \a t à l'écran (\a W x \a H) selon la
  * matrice de model-view \a model_view_matrix et de projection \a projection_matrix.
  *
  * Cette fonction utilise \a vtransform sur chaque sommet de la
@@ -83,15 +83,14 @@ vertex_t vtransform(surface_t * s, vertex_t v, float * model_view_matrix, float 
  * du triangle par rapport au cube unitaire.
  *
  * \see vtransform
- * \see clip2_unit_cube
- */
+ * \see clip2_unit_cube */
 void stransform(surface_t * s, float * model_view_matrix, float * projection_matrix, float * viewport) {
     int i, j;
     float ti_model_view_matrix[16];
     triangle_t vcull;
     /* calcul de la transposée de l'inverse de la matrice model-view
-        pour la transformation des normales et le calcul du lambertien
-        utilisé par le shading Gouraud dans vtransform. */
+     * pour la transformation des normales et le calcul du lambertien
+     * utilisé par le shading Gouraud dans vtransform. */
     memcpy(ti_model_view_matrix, model_view_matrix, sizeof ti_model_view_matrix);
     MMAT4INVERSE(ti_model_view_matrix);
     MMAT4TRANSPOSE(ti_model_view_matrix);
@@ -116,7 +115,7 @@ void stransform(surface_t * s, float * model_view_matrix, float * projection_mat
     }
 }
 
-/*!\brief multiplie deux matrices : \a res = \a res x \a m */
+/*!\brief Multiplie deux matrices : \a res = \a res x \a m */
 void mult_matrix(float * res, float * m) {
     /* res = res x m */
     float cpy[16];
@@ -124,7 +123,7 @@ void mult_matrix(float * res, float * m) {
     MMAT4XMAT4(res, cpy, m);
 }
 
-/*!\brief ajoute (multiplication droite) une translation à la matrice
+/*!\brief Ajoute (multiplication droite) une translation à la matrice
  * \a m */
 void translate(float * m, float tx, float ty, float tz) {
     float mat[] = { 1.0f, 0.0f, 0.0f, tx,
@@ -134,7 +133,7 @@ void translate(float * m, float tx, float ty, float tz) {
     mult_matrix(m, mat);
 }
 
-/*!\brief ajoute (multiplication droite) une rotation à la matrice \a
+/*!\brief Ajoute (multiplication droite) une rotation à la matrice \a
  * m */
 void rotate(float * m, float angle, float x, float y, float z) {
     float n = sqrtf(x * x + y * y + z * z);
@@ -167,7 +166,7 @@ void rotate(float * m, float angle, float x, float y, float z) {
     }
 }
 
-/*!\brief ajoute (multiplication droite) un scale à la matrice \a m */
+/*!\brief Ajoute (multiplication droite) un scale à la matrice \a m */
 void scale(float * m, float sx, float sy, float sz) {
     float mat[] = { sx  , 0.0f, 0.0f, 0.0f,
                     0.0f,   sy, 0.0f, 0.0f,
@@ -176,7 +175,7 @@ void scale(float * m, float sx, float sy, float sz) {
     mult_matrix(m, mat);
 }
 
-/*!\brief simule une free camera, voir la doc de gluLookAt */
+/*!\brief Simule une free-camera, voir la doc de gluLookAt */
 void lookAt(float * m, float eyeX, float eyeY, float eyeZ, float centerX, float centerY, float centerZ, float upX, float upY, float upZ) {
     float forward[3], side[3], up[3];
     float mat[] = {
@@ -210,7 +209,7 @@ void lookAt(float * m, float eyeX, float eyeY, float eyeZ, float centerX, float 
     translate(m, -eyeX, -eyeY, -eyeZ);
 }
 
-/*!\brief intersection triangle-cube unitaire, à compléter (voir le
+/*!\brief Intersection triangle-cube unitaire, à compléter (voir le
  * todo du fichier et le commentaire dans le code) */
 void clip2_unit_cube(triangle_t * t) {
     int i, oleft = 0, oright = 0, obottom = 0, otop = 0, onear = 0, ofar = 0;
@@ -230,14 +229,13 @@ void clip2_unit_cube(triangle_t * t) {
     }
     t->state |= PS_PARTIALLY_OUT;
     /* le cas PARTIALLY_OUT n'est pas réellement géré. Il serait
-       nécessaire à partir d'ici de construire la liste des triangles
-       qui repésentent l'intersection entre le triangle d'origine et
-       le cube unitaire. Ceci permettrait de ne plus avoir besoin de
-       tester si le pixel produit par le raster est bien dans le
-       "screen" avant d'écrire ; et aussi de se passer du "hack"
-       PS_TOO_FAR qui est problématique.  Vous pouvez vous inspirer de
-       ce qui est fait là :
-       https://github.com/erich666/GraphicsGems/blob/master/gems/PolyScan/poly_clip.c
-       en le ramenant au cas d'un triangle.
-    */
+     * nécessaire à partir d'ici de construire la liste des triangles
+     * qui repésentent l'intersection entre le triangle d'origine et
+     * le cube unitaire. Ceci permettrait de ne plus avoir besoin de
+     * tester si le pixel produit par le raster est bien dans le
+     * "screen" avant d'écrire ; et aussi de se passer du "hack"
+     * PS_TOO_FAR qui est problématique.  Vous pouvez vous inspirer de
+     * ce qui est fait là :
+     * https://github.com/erich666/GraphicsGems/blob/master/gems/PolyScan/poly_clip.c
+     * en le ramenant au cas d'un triangle. */
 }

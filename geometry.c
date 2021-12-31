@@ -5,7 +5,7 @@
  *
  * \author Farès BELHADJ, amsi@up8.edu
  * \date November, 2021.
-*/
+ */
 #include "rasterize.h"
 #include <assert.h>
 #if defined(_MSC_VER)
@@ -13,7 +13,7 @@
 #endif
 #include <math.h>
 
-/*!\brief fabrique et renvoie une surface représentant un
+/*!\brief Fabrique et renvoie une surface représentant un
  * quadrilatère "debout" et à la profondeur 0. Il fait la hauteur et
  * la largeur du cube unitaire (-1 à 1).*/
 surface_t * mk_quad(void) {
@@ -44,7 +44,7 @@ surface_t * mk_quad(void) {
     return s;
 }
 
-/*!\brief fabrique et renvoie une surface représentant un
+/*!\brief Fabrique et renvoie une surface représentant un
  * cube unitaire (de -1 à 1).*/
 surface_t * mk_cube(void) {
     const float
@@ -100,7 +100,7 @@ surface_t * mk_cube(void) {
     return s;
 }
 
-/*!\brief fabrique et renvoie une surface représentant une sphère
+/*!\brief Fabrique et renvoie une surface représentant une sphère
  * centrée en zéro et de rayon 1. Elle est découpée en \a longitudes
  * longitudes et \a latitudes latitudes. */
 surface_t * mk_sphere(int longitudes, int latitudes) {
@@ -130,7 +130,7 @@ surface_t * mk_sphere(int longitudes, int latitudes) {
             data[k].texCoord.x = phi / (2.0 * M_PI);
             data[k].texCoord.y = (theta + M_PI_2) / M_PI;
             data[k].color0     = color0;
-            /* gcc 7.5 et plus abusent : data[k].normal     = *(vec3 *)&(data[k].position); */
+            /* gcc 7.5 et plus abusent : data[k].normal = *(vec3 *)&(data[k].position); */
             data[k].normal.x   = data[k].position.x;
             data[k].normal.y   = data[k].position.y;
             data[k].normal.z   = data[k].position.z;
