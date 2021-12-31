@@ -144,8 +144,12 @@ void idle(void) {
     t0 = t;
 
     /* Mouvements du héros A */
-    float zA = (float)((_herosA.z + _cubeSize * _grilleH / 2) / _cubeSize);
-    float xA = (float)((_herosA.x + _cubeSize * _grilleW / 2) / _cubeSize);
+    float zA = (float)((_herosA.z + _cubeSize * _grilleH / 2) / _cubeSize); // ligne
+    float xA = (float)((_herosA.x + _cubeSize * _grilleW / 2) / _cubeSize); // colonne
+    printf("%d - %d - ", (int)zA, (int)xA);
+    // int truc = (int)((zA + .5f) * (xA + .5f));
+    int truc = (zA - 1) * _grilleH * xA;
+    printf("(%d)%d", truc, _grille[truc]);
     if(_vkeyboard[VK_RIGHT])
         if(xA < (_grilleW - 2)) // collision à droite du plateau
             _herosA.x += 10.f * dt;
@@ -161,8 +165,8 @@ void idle(void) {
     printf("\n========== Héros A ==========\nli = %f, col = %f\n", zA, xA);
 
     /* Mouvements du héros B */
-    float zB = (float)((_herosB.z + _cubeSize * _grilleH / 2) / _cubeSize);
-    float xB = (float)((_herosB.x + _cubeSize * _grilleW / 2) / _cubeSize);
+    float zB = (float)((_herosB.z + _cubeSize * _grilleH / 2) / _cubeSize); // ligne
+    float xB = (float)((_herosB.x + _cubeSize * _grilleW / 2) / _cubeSize); // colonne
     if(_vkeyboard[VK_d])
         if(xB < (_grilleW - 2)) // collision à droite du plateau
             _herosB.x += 10.f * dt;
