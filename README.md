@@ -45,5 +45,11 @@ Puis pour lancer le jeu :
 ## Présentation
 La présentation se trouve dans le [dossier présentation](presentation/presentation.tex) du projet.
 
+## Commandes
+- Déplacement du joueur A avec mes flèches directionnelles
+- Déplacement du joueur B avec Z Q S D
+- Activation/Désactivation de la synchronisation verticale à l'appuie de la touche `v`
+- Activation/Désactivation des logs de debug dans la console à l'appuie de la touche `h`
+
 ## Sources
 - [Image du dépôt](https://pixabay.com/vectors/bomb-cartoon-iconic-2025548/)
