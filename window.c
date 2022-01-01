@@ -33,7 +33,11 @@ static float _cubeSize = 4.f;
 /* Variable d'état pour activer/désactiver la synchronisation verticale */
 static int _use_vsync = 1;
 
-/* Grille de positions où il y aura des cubes */
+/* Grille de positions où il y aura des cubes
+ * 0 -> Vide
+ * 1 -> Mur
+ * 2 (valeur reservée) -> Joueur A (défini automatiquement par le programme)
+ * 3 (valeur reservée) -> Joueur B (défini automatiquement par le programme) */
 static int _grille[] = {
     1, 1, 1, 1, 1, 1, 1,
     1, 0, 1, 0, 0, 0, 1,
@@ -161,6 +165,7 @@ void idle(void) {
     float xA = (float)((_herosA.x + _cubeSize * _grilleW / 2) / _cubeSize); // colonne - longueur
 
     /* Coordonnées joueur A */
+    int coorJoueurA = round(zA) * _grilleH + round(xA);
     int coorDroiteA = round(zA) * _grilleH + ceil(xA);
     int coorHautA   = floor(zA) * _grilleH + round(xA);
     int coorGaucheA = round(zA) * _grilleH + floor(xA);
@@ -170,21 +175,33 @@ void idle(void) {
     float decalageLargeurA  = zA - floor(zA);
     float decalageLongueurA = xA - floor(xA);
 
+    /* Déplacement */
     if(_vkeyboard[VK_RIGHT])
-        if(_grille[coorDroiteA] == 0 && (decalageLargeurA < decalageGB || decalageLargeurA > decalageDH)) // collision à droite du plateau
+        if((_grille[coorDroiteA] == 0 || _grille[coorDroiteA] == 2) && (decalageLargeurA < decalageGB || decalageLargeurA > decalageDH)) // collision à droite du plateau
             _herosA.x += vitesse * dt;
     if(_vkeyboard[VK_UP])
-        if(_grille[coorHautA] == 0 && (decalageLongueurA < decalageGB || decalageLongueurA > decalageDH)) // collision en haut plateau
+        if((_grille[coorHautA] == 0 || _grille[coorHautA] == 2) && (decalageLongueurA < decalageGB || decalageLongueurA > decalageDH)) // collision en haut plateau
             _herosA.z -= vitesse * dt;
     if(_vkeyboard[VK_LEFT])
-        if(_grille[coorGaucheA] == 0 && (decalageLargeurA < decalageGB || decalageLargeurA > decalageDH)) // collision à gauche du plateau
+        if((_grille[coorGaucheA] == 0 || _grille[coorGaucheA] == 2) && (decalageLargeurA < decalageGB || decalageLargeurA > decalageDH)) // collision à gauche du plateau
             _herosA.x -= vitesse * dt;
     if(_vkeyboard[VK_DOWN])
-        if(_grille[coorBasA] == 0 && (decalageLongueurA < decalageGB || decalageLongueurA > decalageDH)) // collision en bas du plateau
+        if((_grille[coorBasA] == 0 || _grille[coorBasA] == 2) && (decalageLongueurA < decalageGB || decalageLongueurA > decalageDH)) // collision en bas du plateau
             _herosA.z += vitesse * dt;
-    printf("\n==== Héros A ====\n li = %d, col = %d\n", (int)(zA + .5f), (int)(xA + .5f));
+
+    /* Affichage Debug */
+    printf("\n==== Héros A ====\n li = %d, col = %d, pos = %d\n", (int)(zA + .5f), (int)(xA + .5f), _herosA.position);
     printf("zA=%f xA=%f\n", zA, xA);
     printf("d=%d h=%d g=%d b=%d\n", coorDroiteA, coorHautA, coorGaucheA, coorBasA);
+
+    /* Anti-collision entre joueurs */
+    if(_herosA.position != coorJoueurA) {
+        if(_herosA.position != -1)
+            _grille[_herosA.position] = 0;
+        _herosA.position = coorJoueurA;
+        _grille[coorJoueurA] = 2;
+    }
+
 
     /* Mouvements du héros B */
     /* Coordonées x, z */
@@ -192,6 +209,7 @@ void idle(void) {
     float xB = (float)((_herosB.x + _cubeSize * _grilleW / 2) / _cubeSize); // colonne - longueur
 
     /* Coordonnées joueur A */
+    int coorJoueurB = round(zB) * _grilleH + round(xB);
     int coorDroiteB = round(zB) * _grilleH + ceil(xB);
     int coorHautB   = floor(zB) * _grilleH + round(xB);
     int coorGaucheB = round(zB) * _grilleH + floor(xB);
@@ -201,21 +219,32 @@ void idle(void) {
     float decalageLargeurB  = zB - floor(zB);
     float decalageLongueurB = xB - floor(xB);
 
+    /* Déplacement */
     if(_vkeyboard[VK_d])
-        if(_grille[coorDroiteB] == 0 && (decalageLargeurB < decalageGB || decalageLargeurB > decalageDH)) // collision à droite du plateau
+        if((_grille[coorDroiteB] == 0 || _grille[coorDroiteB] == 3) && (decalageLargeurB < decalageGB || decalageLargeurB > decalageDH)) // collision à droite du plateau
             _herosB.x += vitesse * dt;
     if(_vkeyboard[VK_z])
-        if(_grille[coorHautB] == 0 && (decalageLongueurB < decalageGB || decalageLongueurB > decalageDH)) // collision en haut plateau
+        if((_grille[coorHautB] == 0 || _grille[coorHautB] == 3) && (decalageLongueurB < decalageGB || decalageLongueurB > decalageDH)) // collision en haut plateau
             _herosB.z -= vitesse * dt;
     if(_vkeyboard[VK_q])
-        if(_grille[coorGaucheB] == 0 && (decalageLargeurB < decalageGB || decalageLargeurB > decalageDH)) // collision à gauche du plateau
+        if((_grille[coorGaucheB] == 0 || _grille[coorGaucheB] == 3) && (decalageLargeurB < decalageGB || decalageLargeurB > decalageDH)) // collision à gauche du plateau
             _herosB.x -= vitesse * dt;
     if(_vkeyboard[VK_s])
-        if(_grille[coorBasB] == 0 && (decalageLongueurB < decalageGB || decalageLongueurB > decalageDH)) // collision en bas du plateau
+        if((_grille[coorBasB] == 0 || _grille[coorBasB] == 3) && (decalageLongueurB < decalageGB || decalageLongueurB > decalageDH)) // collision en bas du plateau
             _herosB.z += vitesse * dt;
-    printf("==== Héros B ====\n li = %d, col = %d\n=================\n", (int)(zB + .5f), (int)(xB + .5f));
+
+    /* Affichage Debug */
+    printf("==== Héros B ====\n li = %d, col = %d, pos = %d\n=================\n", (int)(zB + .5f), (int)(xB + .5f), _herosB.position);
     printf("zA=%f xA=%f\n", zB, xB);
     printf("d=%d h=%d g=%d b=%d\n", coorDroiteB, coorHautB, coorGaucheB, coorBasB);
+
+    /* Anti-collision entre joueurs */
+    if(_herosB.position != coorJoueurB) {
+        if(_herosB.position != -1)
+            _grille[_herosB.position] = 0;
+        _herosB.position = coorJoueurB;
+        _grille[coorJoueurB] = 3;
+    }
 }
 
 /*!\brief Fonction appelée à chaque display. */
