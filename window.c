@@ -4,6 +4,7 @@
  * \date November 16, 2021.
  */
 #include <assert.h>
+#include <time.h>
 
 /* Inclusion des entêtes de fonctions de gestion de primitives simples
  * de dessin. La lettre p signifie aussi bien primitive que
@@ -44,17 +45,9 @@ static int _debug = 0;
  * 1 -> Mur
  * 2 (valeur reservée) -> Joueur A (défini automatiquement par le programme)
  * 3 (valeur reservée) -> Joueur B (défini automatiquement par le programme) */
-static int _grille[] = {
-    1, 1, 1, 1, 1, 1, 1,
-    1, 0, 1, 0, 0, 0, 1,
-    1, 0, 1, 0, 0, 0, 1,
-    1, 0, 1, 1, 0, 1, 1,
-    1, 0, 0, 0, 0, 1, 1,
-    1, 0, 0, 1, 0, 0, 1,
-    1, 1, 1, 1, 1, 1, 1
-};
-static int _grilleW = 7;
-static int _grilleH = 7;
+static int * _grille = NULL;
+static int _grilleW;
+static int _grilleH;
 
 /* Définition d'un personnage */
 typedef struct perso_t {
@@ -64,8 +57,8 @@ typedef struct perso_t {
 } perso_t;
 
 /* Définition de nos deux joueurs */
-perso_t _herosA = { 6.f, 0.f, -6.f, -1, NULL }; // à droite
-perso_t _herosB = { -10.f, 0.f, 0.f, -1, NULL }; // à gauche
+perso_t _herosA = { 4.f, 0.f, -6.f, -1, NULL }; // à droite
+perso_t _herosB = { -4.f, 0.f, -1.f, -1, NULL }; // à gauche
 
 /* Clavier virtuel */
 enum {
@@ -147,6 +140,51 @@ void init(void) {
 
     /* Si _use_vsync != 0, on active la synchronisation verticale */
     SDL_GL_SetSwapInterval(_use_vsync);
+
+    /* Génération du plateau */
+    srand(time(NULL));
+
+    _grilleW = 10 + (rand() % 10);
+    _grilleH = _grilleW;
+    printf("%d & %d\n", _grilleW, _grilleH);
+
+    if ((_grille = malloc((_grilleW * _grilleH) * sizeof(int))) == NULL) {
+        printf("Impossible d'allouer de la mémoire supplémentaire pour générer le plateau.\n");
+        sortie();
+        exit(1);
+    }
+
+    int _curseur = 0;
+    for(int i = 0; i < _grilleH; i++)
+        for(int j = 0; j < _grilleW; j++) {
+            if (i == 0) {
+                _grille[_curseur] = 1;
+                _curseur++;
+                continue;
+            }
+            if (i == (_grilleH - 1)) {
+                _grille[_curseur] = 1;
+                _curseur++;
+                continue;
+            }
+            if (j == 0) {
+                _grille[_curseur] = 1;
+                _curseur++;
+                continue;
+            }
+            if (j == (_grilleW - 1)) {
+                _grille[_curseur] = 1;
+                _curseur++;
+                continue;
+            }
+            if ((j % 2) == 0 && (i % 2) == 0) {
+                _grille[_curseur] = 1;
+                _curseur++;
+                continue;
+            }
+            _grille[_curseur] = 0;
+            _curseur++;
+        }
 
     /* Mets en place la fonction à appeler en cas de sortie */
     atexit(sortie);
@@ -284,7 +322,7 @@ void draw(void) {
     /* Charger la matrice identité dans model-view */
     MIDENTITY(model_view_matrix);
     /* On place la caméra en arrière-haut, elle regarde le centre de la scène */
-    lookAt(model_view_matrix, 0, 30 /* zoom */, 30 /* inclinaison */, 0, 0, 0, 0, 0, -1);
+    lookAt(model_view_matrix, 0, 100 /* zoom */, 30 /* inclinaison */, 0, 0, 0, 0, 0, -1);
 
     /* Pour centrer la grille par rapport au monde */
     float cX = -_cubeSize * _grilleW / 2.0f;
