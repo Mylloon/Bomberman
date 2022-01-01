@@ -30,6 +30,9 @@ static void sortie(void);
 static surface_t * _cube = NULL;
 static float _cubeSize = 4.f;
 
+/*!\brief Surface représentant une sphère */
+static surface_t * _sphere = NULL;
+
 /* Variable d'état pour activer/désactiver la synchronisation verticale */
 static int _use_vsync = 1;
 
@@ -126,17 +129,21 @@ void init(void) {
     gl4dpInitScreen();
 
     /* Création du cube */
-    _cube = mk_cube(); /* ça fait 2x6 triangles */
+    _cube   = mk_cube(); /* ça fait 2x6 triangles */
+    _sphere = mk_sphere(12, 12); /* ça fait 12x12 triangles */
 
     /* Rajoute la texture */
     id = get_texture_from_BMP("images/tex.bmp");
     set_texture_id(_cube, id);
+    set_texture_id(_sphere, id);
 
     /* Affichage des textures */
     enable_surface_option(_cube, SO_USE_TEXTURE);
+    enable_surface_option(_sphere, SO_USE_TEXTURE);
 
     /* Affichage des ombres */
     enable_surface_option(_cube, SO_USE_LIGHTING);
+    enable_surface_option(_sphere, SO_USE_LIGHTING);
 
     /* Si _use_vsync != 0, on active la synchronisation verticale */
     SDL_GL_SetSwapInterval(_use_vsync);
@@ -183,7 +190,7 @@ void idle(void) {
         if((_grille[coorDroiteA] == 0 || _grille[coorDroiteA] == 2) && (decalageLargeurA < decalageGB || decalageLargeurA > decalageDH)) // collision à droite du plateau
             _herosA.x += vitesse * dt;
     if(_vkeyboard[VK_UP])
-        if((_grille[coorHautA] == 0 || _grille[coorHautA] == 2) && (decalageLongueurA < decalageGB || decalageLongueurA > decalageDH)) // collision en haut plateau
+        if((_grille[coorHautA] == 0 || _grille[coorHautA] == 2) && (decalageLongueurA < decalageGB || decalageLongueurA > decalageDH)) // collision en haut du plateau
             _herosA.z -= vitesse * dt;
     if(_vkeyboard[VK_LEFT])
         if((_grille[coorGaucheA] == 0 || _grille[coorGaucheA] == 2) && (decalageLargeurA < decalageGB || decalageLargeurA > decalageDH)) // collision à gauche du plateau
@@ -230,7 +237,7 @@ void idle(void) {
         if((_grille[coorDroiteB] == 0 || _grille[coorDroiteB] == 3) && (decalageLargeurB < decalageGB || decalageLargeurB > decalageDH)) // collision à droite du plateau
             _herosB.x += vitesse * dt;
     if(_vkeyboard[VK_z])
-        if((_grille[coorHautB] == 0 || _grille[coorHautB] == 3) && (decalageLongueurB < decalageGB || decalageLongueurB > decalageDH)) // collision en haut plateau
+        if((_grille[coorHautB] == 0 || _grille[coorHautB] == 3) && (decalageLongueurB < decalageGB || decalageLongueurB > decalageDH)) // collision en haut du plateau
             _herosB.z -= vitesse * dt;
     if(_vkeyboard[VK_q])
         if((_grille[coorGaucheB] == 0 || _grille[coorGaucheB] == 3) && (decalageLargeurB < decalageGB || decalageLargeurB > decalageDH)) // collision à gauche du plateau
@@ -259,7 +266,9 @@ void idle(void) {
 
 /*!\brief Fonction appelée à chaque display. */
 void draw(void) {
-    vec4 couleurPlateau = {0.2, 0.2, 0.2, 1} /* Gris */, couleurHerosA = {0.15, 0.5, 0.15, 1} /* Vert */, couleurHerosB = {0.2, 0.2, 0.7, 1} /* Bleu */;
+    vec4 couleurPlateau = {0.2, 0.2, 0.2, 1} /* Gris */,
+         couleurHerosA  = {0.15, 0.5, 0.15, 1} /* Vert */,
+         couleurHerosB  = {0.2, 0.2, 0.7, 1} /* Bleu */;
 
     float model_view_matrix[16], projection_matrix[16], nmv[16];
 
@@ -290,7 +299,7 @@ void draw(void) {
         for(int j = 0; j < _grilleH; ++j)
             if(_grille[i * _grilleW + j] == 1) {
                 /* copie model_view_matrix dans nmv */
-                memcpy(nmv, model_view_matrix, sizeof nmv);
+                memcpy(nmv, model_view_matrix, sizeof(nmv));
 
                 /* pour convertir les coordonnées i, j de la grille en x, z du monde */
                 translate(nmv, _cubeSize * j + cX, 0.0f, _cubeSize * i + cZ);
@@ -300,17 +309,23 @@ void draw(void) {
 
     /* Dessine le héros A */
     _cube->dcolor = couleurHerosA;
-    memcpy(nmv, model_view_matrix, sizeof nmv);
+    _sphere->dcolor = couleurHerosA;
+    memcpy(nmv, model_view_matrix, sizeof(nmv));
     translate(nmv, _herosA.x, _herosA.y, _herosA.z);
     scale(nmv, _cubeSize / 3.0f, _cubeSize / 3.0f, _cubeSize / 3.0f);
     transform_n_rasterize(_cube, nmv, projection_matrix);
+    translate(nmv, 0.0f, 2.0f, 0.0f);
+    transform_n_rasterize(_sphere, nmv, projection_matrix);
 
     /* Dessine le héros B */
     _cube->dcolor = couleurHerosB;
-    memcpy(nmv, model_view_matrix, sizeof nmv);
+    _sphere->dcolor = couleurHerosB;
+    memcpy(nmv, model_view_matrix, sizeof(nmv));
     translate(nmv, _herosB.x, _herosB.y, _herosB.z);
     scale(nmv, _cubeSize / 3.0f, _cubeSize / 3.0f, _cubeSize / 3.0f);
     transform_n_rasterize(_cube, nmv, projection_matrix);
+    translate(nmv, 0.0f, 2.0f, 0.0f);
+    transform_n_rasterize(_sphere, nmv, projection_matrix);
 
     /* Déclare que l'on a changé des pixels de l'écran (bas niveau) */
     gl4dpScreenHasChanged();
@@ -423,6 +438,12 @@ void sortie(void) {
     if(_cube) {
         free_surface(_cube);
         _cube = NULL;
+    }
+
+    /* on libère la sphère */
+    if(_sphere) {
+        free_surface(_sphere);
+        _sphere = NULL;
     }
 
     /* libère tous les objets produits par GL4Dummies, ici
