@@ -144,9 +144,13 @@ void init(void) {
     /* Génération du plateau */
     srand(time(NULL));
 
+    /* TODO
+     * Génération pour _grilleH aléatoire aussi
+     * Corriger la position des joueurs en fonction de la map pour pas spawn dans un mur
+     * Zoom de la caméra en fonction de la taille de la map */
+
     _grilleW = 10 + (rand() % 10);
     _grilleH = _grilleW;
-    printf("%d & %d\n", _grilleW, _grilleH);
 
     if ((_grille = malloc((_grilleW * _grilleH) * sizeof(int))) == NULL) {
         printf("Impossible d'allouer de la mémoire supplémentaire pour générer le plateau.\n");
