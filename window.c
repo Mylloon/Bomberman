@@ -151,7 +151,7 @@ void idle(void) {
     float vitesse = 10.f; // vitesse des joueurs
 
     /* Calcul du décalage */
-    float decalageAutorisee = .08f; // décalage autorisé, modifier cette valeur si nécessaire
+    float decalageAutorisee = .15f; // décalage autorisé, modifier cette valeur si nécessaire
     float decalageGB = .0f + decalageAutorisee; // décalage pour la gauche et le bas
     float decalageDH = 1.f - decalageAutorisee; // décalage pour la droite et le haut
 
@@ -222,15 +222,6 @@ void idle(void) {
 void draw(void) {
     vec4 couleurPlateau = {0.2, 0.2, 0.2, 1} /* Gris */, couleurHerosA = {0.15, 0.5, 0.15, 1} /* Vert */, couleurHerosB = {0.2, 0.2, 0.7, 1} /* Bleu */;
 
-    /* On va récupérer le delta-temps */
-    static double t0 = 0.0; // le temps à la frame précédente
-    double t, dt;
-    t = gl4dGetElapsedTime();
-    dt = (t - t0) / 1000.0; // diviser par mille pour avoir des secondes
-    // Pour le frame d'après, mets à-jour t0
-    t0 = t;
-
-    static float a = 0.0f;
     float model_view_matrix[16], projection_matrix[16], nmv[16];
 
     /* Efface l'écran et le buffer de profondeur */
@@ -272,22 +263,21 @@ void draw(void) {
     _cube->dcolor = couleurHerosA;
     memcpy(nmv, model_view_matrix, sizeof nmv);
     translate(nmv, _herosA.x, _herosA.y, _herosA.z);
-    scale(nmv, _cubeSize / 2.0f, _cubeSize / 2.0f, _cubeSize / 2.0f);
+    scale(nmv, _cubeSize / 3.0f, _cubeSize / 3.0f, _cubeSize / 3.0f);
     transform_n_rasterize(_cube, nmv, projection_matrix);
 
     /* Dessine le héros B */
     _cube->dcolor = couleurHerosB;
     memcpy(nmv, model_view_matrix, sizeof nmv);
     translate(nmv, _herosB.x, _herosB.y, _herosB.z);
-    scale(nmv, _cubeSize / 2.0f, _cubeSize / 2.0f, _cubeSize / 2.0f);
+    scale(nmv, _cubeSize / 3.0f, _cubeSize / 3.0f, _cubeSize / 3.0f);
     transform_n_rasterize(_cube, nmv, projection_matrix);
 
-    /* Déclarer qu'on a changé des pixels du screen (en bas niveau) */
+    /* Déclare que l'on a changé des pixels de l'écran (bas niveau) */
     gl4dpScreenHasChanged();
 
     /* Fonction permettant de raffraîchir l'ensemble de la fenêtre*/
     gl4dpUpdateScreen(NULL);
-    a += 0.1f * 360.0f * dt;
 }
 
 /*!\brief Intercepte l'événement clavier pour modifier les options (à l'appuie d'une touche). */
