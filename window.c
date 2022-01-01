@@ -311,9 +311,11 @@ void draw(void) {
     _cube->dcolor = couleurHerosA;
     _sphere->dcolor = couleurHerosA;
     memcpy(nmv, model_view_matrix, sizeof(nmv));
+    /* Corps */
     translate(nmv, _herosA.x, _herosA.y, _herosA.z);
     scale(nmv, _cubeSize / 3.0f, _cubeSize / 3.0f, _cubeSize / 3.0f);
     transform_n_rasterize(_cube, nmv, projection_matrix);
+    /* Tête */
     translate(nmv, 0.0f, 2.0f, 0.0f);
     transform_n_rasterize(_sphere, nmv, projection_matrix);
 
@@ -321,9 +323,11 @@ void draw(void) {
     _cube->dcolor = couleurHerosB;
     _sphere->dcolor = couleurHerosB;
     memcpy(nmv, model_view_matrix, sizeof(nmv));
+    /* Corps */
     translate(nmv, _herosB.x, _herosB.y, _herosB.z);
     scale(nmv, _cubeSize / 3.0f, _cubeSize / 3.0f, _cubeSize / 3.0f);
     transform_n_rasterize(_cube, nmv, projection_matrix);
+    /* Tête */
     translate(nmv, 0.0f, 2.0f, 0.0f);
     transform_n_rasterize(_sphere, nmv, projection_matrix);
 
@@ -346,6 +350,7 @@ void keyd(int keycode) {
                 SDL_GL_SetSwapInterval(0);
             break;
 
+        /* 'h' afficher ou non les infos de debug */
         case GL4DK_h:
             _debug = !_debug;
             break;
