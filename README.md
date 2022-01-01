@@ -14,7 +14,7 @@
 - [ ] Modélisation des joueurs avec un cône surmonté d'une sphère, de couleurs différentes
 - [ ] Modélisation de sphères noires en guise de bombes
 - [ ] Modélisation du rayon de l'explosion par des sphères jaunes dont le rayon décroit avec la distance
-- [ ] Collisions et interactions logiques
+- [x] Collisions et interactions logiques
 - [ ] IA ennemies
 - [ ] Mode multijoueur local
 - [ ] Mode multijoueur "en ligne" (sur différentes machine)
