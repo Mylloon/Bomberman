@@ -33,6 +33,9 @@ static float _cubeSize = 4.f;
 /* Variable d'état pour activer/désactiver la synchronisation verticale */
 static int _use_vsync = 1;
 
+/* Variable d'état pour activer/désactiver le debug */
+static int _debug = 0;
+
 /* Grille de positions où il y aura des cubes
  * 0 -> Vide
  * 1 -> Mur
@@ -190,9 +193,11 @@ void idle(void) {
             _herosA.z += vitesse * dt;
 
     /* Affichage Debug */
-    printf("\n==== Héros A ====\n li = %d, col = %d, pos = %d\n", (int)(zA + .5f), (int)(xA + .5f), _herosA.position);
-    printf("zA=%f xA=%f\n", zA, xA);
-    printf("d=%d h=%d g=%d b=%d\n", coorDroiteA, coorHautA, coorGaucheA, coorBasA);
+    if(_debug) {
+        printf("\n==== Héros A ====\n li = %d, col = %d, pos = %d\n", (int)(zA + .5f), (int)(xA + .5f), _herosA.position);
+        printf("zA=%f xA=%f\n", zA, xA);
+        printf("d=%d h=%d g=%d b=%d\n", coorDroiteA, coorHautA, coorGaucheA, coorBasA);
+    }
 
     /* Anti-collision entre joueurs */
     if(_herosA.position != coorJoueurA) {
@@ -234,9 +239,11 @@ void idle(void) {
             _herosB.z += vitesse * dt;
 
     /* Affichage Debug */
-    printf("==== Héros B ====\n li = %d, col = %d, pos = %d\n=================\n", (int)(zB + .5f), (int)(xB + .5f), _herosB.position);
-    printf("zA=%f xA=%f\n", zB, xB);
-    printf("d=%d h=%d g=%d b=%d\n", coorDroiteB, coorHautB, coorGaucheB, coorBasB);
+    if(_debug) {
+        printf("==== Héros B ====\n li = %d, col = %d, pos = %d\n=================\n", (int)(zB + .5f), (int)(xB + .5f), _herosB.position);
+        printf("zA=%f xA=%f\n", zB, xB);
+        printf("d=%d h=%d g=%d b=%d\n", coorDroiteB, coorHautB, coorGaucheB, coorBasB);
+    }
 
     /* Anti-collision entre joueurs */
     if(_herosB.position != coorJoueurB) {
@@ -319,6 +326,10 @@ void keyd(int keycode) {
                 SDL_GL_SetSwapInterval(1);
             else
                 SDL_GL_SetSwapInterval(0);
+            break;
+
+        case GL4DK_h:
+            _debug = !_debug;
             break;
 
         /* Héros A */
