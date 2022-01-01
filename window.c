@@ -194,9 +194,10 @@ void idle(void) {
 
     /* Affichage Debug */
     if(_debug) {
-        printf("\n==== Héros A ====\n li = %d, col = %d, pos = %d\n", (int)(zA + .5f), (int)(xA + .5f), _herosA.position);
-        printf("zA=%f xA=%f\n", zA, xA);
-        printf("d=%d h=%d g=%d b=%d\n", coorDroiteA, coorHautA, coorGaucheA, coorBasA);
+        printf("\n========= Héros A =========\n");
+        printf(" li = %d, col = %d, idx = %d\n", (int)(zA + .5f), (int)(xA + .5f), _herosA.position);
+        printf(" zA=%f xA=%f\n", zA, xA);
+        printf(" d=%d h=%d g=%d b=%d\n", coorDroiteA, coorHautA, coorGaucheA, coorBasA);
     }
 
     /* Anti-collision entre joueurs */
@@ -240,9 +241,11 @@ void idle(void) {
 
     /* Affichage Debug */
     if(_debug) {
-        printf("==== Héros B ====\n li = %d, col = %d, pos = %d\n=================\n", (int)(zB + .5f), (int)(xB + .5f), _herosB.position);
-        printf("zA=%f xA=%f\n", zB, xB);
-        printf("d=%d h=%d g=%d b=%d\n", coorDroiteB, coorHautB, coorGaucheB, coorBasB);
+        printf("========= Héros B =========\n");
+        printf(" li = %d, col = %d, idx = %d\n", (int)(zB + .5f), (int)(xB + .5f), _herosB.position);
+        printf(" zA=%f xA=%f\n", zB, xB);
+        printf(" d=%d h=%d g=%d b=%d\n", coorDroiteB, coorHautB, coorGaucheB, coorBasB);
+        printf("===========================\n");
     }
 
     /* Anti-collision entre joueurs */
