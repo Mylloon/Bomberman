@@ -2,6 +2,7 @@
 documentation/*
 
 !Doxyfile
+!presentation.tex
 
 *.o
 bomberman

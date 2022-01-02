@@ -43,7 +43,7 @@ Puis pour lancer le jeu :
 ```
 
 ## Présentation
-La présentation se trouve dans le [dossier présentation](presentation/presentation.tex) du projet.
+La présentation se trouve dans le [dossier de documentation](presentation/presentation.tex) du projet.
 
 ## Commandes
 - Déplacement du joueur A avec mes flèches directionnelles
