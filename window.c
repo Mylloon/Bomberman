@@ -355,8 +355,10 @@ void idle(void) {
             if(trouveA == 0 && trouveB == 0) mort = 4;
 
             if(mort != 0) {
+                char joueur = 'B';
+                if(mort == 2) joueur = 'A';
                 if(mort == 4) printf("TERMINÉ ! TOUT LE MONDE A PERDU !\n");
-                else printf("TERMINÉ ! JOUEUR %d A PERDU !\n", mort);
+                else printf("TERMINÉ ! JOUEUR %c A PERDU !\n", joueur);
                 sortie();
                 exit(0);
             }
@@ -462,8 +464,10 @@ void idle(void) {
             if(trouveA == 0 && trouveB == 0) mort = 4;
 
             if(mort != 0) {
+                char joueur = 'B';
+                if(mort == 2) joueur = 'A';
                 if(mort == 4) printf("TERMINÉ ! TOUT LE MONDE A PERDU !\n");
-                else printf("TERMINÉ ! JOUEUR %d A PERDU !\n", mort);
+                else printf("TERMINÉ ! JOUEUR %c A PERDU !\n", joueur);
                 sortie();
                 exit(0);
             }
