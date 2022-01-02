@@ -331,11 +331,10 @@ void idle(void) {
     }
 
     /* Anti-collision entre joueurs */
-    if(_joueurA.position != posJoueurA && _plateau[posJoueurA] != 6 && _plateau[_joueurA.position] != 6) {
-        if(_joueurA.position != -1)
-            _plateau[_joueurA.position] = 0;
-        _joueurA.position = posJoueurA;
-        _plateau[posJoueurA] = 2;
+    if(_joueurA.position != posJoueurA && _plateau[posJoueurA] != 6 && _plateau[_joueurA.position] != 6) { // si position différente et pas une bombe
+        _plateau[_joueurA.position] = 0; // on met l'ancienne position a un bloc vide
+        _joueurA.position = posJoueurA; // on change la position dans perso_t
+        _plateau[posJoueurA] = 2; // on met a jour le plateau
     }
 
 
@@ -392,11 +391,10 @@ void idle(void) {
     }
 
     /* Anti-collision entre joueurs */
-    if(_joueurB.position != posJoueurB && _plateau[posJoueurB] != 6 && _plateau[_joueurB.position] != 6) {
-        if(_joueurB.position != -1)
-            _plateau[_joueurB.position] = 0;
-        _joueurB.position = posJoueurB;
-        _plateau[posJoueurB] = 3;
+    if(_joueurB.position != posJoueurB && _plateau[posJoueurB] != 6 && _plateau[_joueurB.position] != 6) { // si position différente et pas une bombe
+        _plateau[_joueurB.position] = 0; // on met l'ancienne position a un bloc vide
+        _joueurB.position = posJoueurB; // on change la position dans perso_t
+        _plateau[posJoueurB] = 3; // on met a jour le plateau
     }
 }
 
