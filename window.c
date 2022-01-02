@@ -73,12 +73,14 @@ enum {
     VK_UP,
     VK_LEFT,
     VK_DOWN,
+    VK_RETURN,
 
     /* Joueur B */
     VK_d,
     VK_z,
     VK_q,
     VK_s,
+    VK_SPACE,
 
     /* Toujours à la fin */
     VK_SIZEOF
@@ -204,7 +206,7 @@ void init(void) {
         for(int j = 0; j < _grilleW; j++) {
             int _case = i * _grilleH + j;
             if(_plateau[_case] == 0)
-                if(rand() % 2)
+                if(rand() % 3 == 0) // 1 chance sur 3
                     _plateau[_case] = 4;
         }
 
@@ -292,6 +294,10 @@ void idle(void) {
     if(_vkeyboard[VK_DOWN])
         if((_plateau[coorBasA] == 0 || _plateau[coorBasA] == 2) && (decalageLongueurA < decalageGB || decalageLongueurA > decalageDH)) // collision en bas du plateau
             _joueurA.z += vitesse * dt;
+    if(_vkeyboard[VK_RETURN]) {
+        _vkeyboard[VK_RETURN] = 0;
+        printf("Joueur A pose une bombe");
+    }
 
     /* Affichage Debug */
     if(_debug) {
@@ -339,6 +345,10 @@ void idle(void) {
     if(_vkeyboard[VK_s])
         if((_plateau[coorBasB] == 0 || _plateau[coorBasB] == 3) && (decalageLongueurB < decalageGB || decalageLongueurB > decalageDH)) // collision en bas du plateau
             _joueurB.z += vitesse * dt;
+    if(_vkeyboard[VK_SPACE]) {
+        _vkeyboard[VK_SPACE] = 0;
+        printf("Joueur B pose une bombe");
+    }
 
     /* Affichage Debug */
     if(_debug) {
@@ -448,8 +458,7 @@ void draw(void) {
 /*!\brief Intercepte l'événement clavier pour modifier les options (à l'appuie d'une touche). */
 void keyd(int keycode) {
     switch(keycode) {
-        /* 'v' utiliser la sync Verticale */
-        case GL4DK_v:
+        case GL4DK_v: // 'v' utiliser la sync Verticale
             _use_vsync = !_use_vsync;
             if(_use_vsync)
                 SDL_GL_SetSwapInterval(1);
@@ -457,43 +466,50 @@ void keyd(int keycode) {
                 SDL_GL_SetSwapInterval(0);
             break;
 
-        /* 'h' afficher ou non les infos de debug */
-        case GL4DK_h:
+        case GL4DK_h: // 'h' afficher ou non les infos de debug
             _debug = !_debug;
             break;
 
         /* Joueur A */
-        case GL4DK_RIGHT:
+        case GL4DK_RIGHT: // droite
             _vkeyboard[VK_RIGHT] = 1;
             break;
 
-        case GL4DK_UP:
+        case GL4DK_UP: // haut
             _vkeyboard[VK_UP] = 1;
             break;
 
-        case GL4DK_LEFT:
+        case GL4DK_LEFT: // gauche
             _vkeyboard[VK_LEFT] = 1;
             break;
 
-        case GL4DK_DOWN:
+        case GL4DK_DOWN: // bas
             _vkeyboard[VK_DOWN] = 1;
             break;
 
+        case GL4DK_RETURN: // pose de bombe
+            _vkeyboard[VK_RETURN] = 1;
+            break;
+
         /* Joueur B */
-        case GL4DK_d:
+        case GL4DK_d: // droite
             _vkeyboard[VK_d] = 1;
             break;
 
-        case GL4DK_z:
+        case GL4DK_z: // haut
             _vkeyboard[VK_z] = 1;
             break;
 
-        case GL4DK_q:
+        case GL4DK_q: // gauche
             _vkeyboard[VK_q] = 1;
             break;
 
-        case GL4DK_s:
+        case GL4DK_s: // bas
             _vkeyboard[VK_s] = 1;
+            break;
+
+        case GL4DK_SPACE: // pose de bombe
+            _vkeyboard[VK_SPACE] = 1;
             break;
 
         /* Par défaut on ne fais rien */
