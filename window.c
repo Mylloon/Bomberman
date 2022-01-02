@@ -41,14 +41,15 @@ static int _use_vsync = 1;
 /*!\brief Variable d'état pour activer/désactiver le debug */
 static int _debug = 0;
 
-/*!\brief Grille de positions où il y aura des cubes
+/*!\brief Grille de positions où il y aura des cubes (valeur reservée = défini automatiquement par le programme)
  * 0 -> Vide
  * 1 -> Mur
- * 2 (valeur reservée) -> Joueur A (défini automatiquement par le programme)
- * 3 (valeur reservée) -> Joueur B (défini automatiquement par le programme)
+ * 2 (valeur reservée) -> Joueur A
+ * 3 (valeur reservée) -> Joueur B
  * 4 -> Bloc destructible
  * 5 -> Mur extérieur
- * 6 (valeur reservée) -> Bombe (défini automatiquement par le programme) */
+ * 6 (valeur reservée) -> Bombe A
+ * 7 (valeur reservée) -> Bombe B */
 static int * _plateau = NULL;
 
 /*!\brief Largeur/Nombre de lignes de la grille */
@@ -65,11 +66,12 @@ typedef struct perso_t {
                     * de se rentrer dedans */
     int bombe;     /* si une bombe est placé par le joueur,
                     * temps écoulé depuis sa pose */
+    int bombePos;  /* Position de la bombe */
 } perso_t;
 
 /* Définition de nos deux joueurs */
-perso_t _joueurA = { 0.f, 0.f, 0.f, -1, 0 }; // à droite
-perso_t _joueurB = { 0.f, 0.f, 6.f, -1, 0 }; // à gauche
+perso_t _joueurA = { 0.f, 0.f, 0.f, -1, 0, -1 }; // à droite
+perso_t _joueurB = { 0.f, 0.f, 6.f, -1, 0, -1 }; // à gauche
 
 /* Clavier virtuel */
 enum {
@@ -300,33 +302,38 @@ void idle(void) {
      * On part de la posdonnées de droite car posDroite = E. */
     if(_vkeyboard[VK_RIGHT])
         /* Collision à droite du joueur */
-        if(_plateau[posDroiteA] == 0 || _plateau[posDroiteA] == 2 || _plateau[posDroiteA] == 6) // si case vide ou joueur ou bombe
+        if(_plateau[posDroiteA] == 0 || _plateau[posDroiteA] == 2 || _plateau[posDroiteA] == 6 || _plateau[posDroiteA] == 7) // si case vide ou joueur ou bombe
             /* if(decalageLargeurA < decalageGB || decalageLargeurA > decalageDH) */ _joueurA.x += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_UP])
         /* Collision en haut du joueur */
-        if(_plateau[posHautA] == 0 || _plateau[posHautA] == 2 || _plateau[posHautA] == 6) // si case vide ou joueur ou bombe
+        if(_plateau[posHautA] == 0 || _plateau[posHautA] == 2 || _plateau[posHautA] == 6 || _plateau[posHautA] == 7) // si case vide ou joueur ou bombe
             /* if(decalageLongueurA < decalageGB || decalageLongueurA > decalageDH) */ _joueurA.z -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_LEFT])
         /* Collision à gauche du joueur */
-        if(_plateau[posGaucheA] == 0 || _plateau[posGaucheA] == 2 || _plateau[posGaucheA] == 6) // si case vide ou joueur ou bombe
+        if(_plateau[posGaucheA] == 0 || _plateau[posGaucheA] == 2 || _plateau[posGaucheA] == 6 || _plateau[posGaucheA] == 7) // si case vide ou joueur ou bombe
             /* if(decalageLargeurA < decalageGB || decalageLargeurA > decalageDH) */ _joueurA.x -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_DOWN])
         /* Collision en bas du joueur */
-        if(_plateau[posBasA] == 0 || _plateau[posBasA] == 2 || _plateau[posBasA] == 6) // si case vide ou joueur ou bombe
+        if(_plateau[posBasA] == 0 || _plateau[posBasA] == 2 || _plateau[posBasA] == 6 || _plateau[posBasA] == 7) // si case vide ou joueur ou bombe
             /* if(decalageLongueurA < decalageGB || decalageLongueurA > decalageDH) */ _joueurA.z += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_RETURN]) {
         _vkeyboard[VK_RETURN] = 0; // on évite de spam la pose de bombe
         if(_joueurA.bombe == 0) {
             _joueurA.bombe = (int)t + 1;
+            _joueurA.bombePos = posJoueurA;
             if(_debug) printf("Joueur A pose une bombe!\n");
             _plateau[posJoueurA] = 6;
-        } else {
-            printf("bombe déjà posé il y a %d secondes\n", (int)(t - (_joueurA.bombe - 1)) / 1000);
         }
+    }
+
+    if((int)(t - (_joueurA.bombe - 1)) / 1000 > 3) { // quand la bombe doit explosé
+        _joueurA.bombe = 0; // remet le timer à 0
+        _plateau[_joueurA.bombePos] = 0; // vide le plateau de la bombe
+        _joueurA.bombePos = -1; // supprime l'ancienne location de la bombe
     }
 
     /* Affichage Debug */
@@ -338,7 +345,7 @@ void idle(void) {
     }
 
     /* Anti-collision entre joueurs */
-    if(_joueurA.position != posJoueurA && _plateau[posJoueurA] != 6 && _plateau[_joueurA.position] != 6) { // si position différente et pas une bombe
+    if(_joueurA.position != posJoueurA && _plateau[posJoueurA] != 6 && _plateau[_joueurA.position] != 6 && _plateau[posJoueurA] != 7 && _plateau[_joueurA.position] != 7) { // si position différente et pas une bombe
         _plateau[_joueurA.position] = 0; // on met l'ancienne position a un bloc vide
         _joueurA.position = posJoueurA; // on change la position dans perso_t
         _plateau[posJoueurA] = 2; // on met a jour le plateau
@@ -364,31 +371,38 @@ void idle(void) {
     /* Déplacement */
     if(_vkeyboard[VK_d])
         /* Collision à droite du joueur */
-        if(_plateau[posDroiteB] == 0 || _plateau[posDroiteB] == 3 || _plateau[posDroiteB] == 6) // si case vide ou joueur ou bombe
+        if(_plateau[posDroiteB] == 0 || _plateau[posDroiteB] == 3 || _plateau[posDroiteB] == 6 || _plateau[posDroiteB] == 7) // si case vide ou joueur ou bombe
             /* if(decalageLargeurB < decalageGB || decalageLargeurB > decalageDH) */ _joueurB.x += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_z])
         /* Collision en haut du joueur */
-        if(_plateau[posHautB] == 0 || _plateau[posHautB] == 3 || _plateau[posHautB] == 6) // si case vide ou joueur ou bombe
+        if(_plateau[posHautB] == 0 || _plateau[posHautB] == 3 || _plateau[posHautB] == 6 || _plateau[posHautB] == 7) // si case vide ou joueur ou bombe
             /* if(decalageLongueurB < decalageGB || decalageLongueurB > decalageDH) */ _joueurB.z -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_q])
         /* Collision à gauche du joueur */
-        if(_plateau[posGaucheB] == 0 || _plateau[posGaucheB] == 3 || _plateau[posGaucheB] == 6) // si case vide ou joueur ou bombe
+        if(_plateau[posGaucheB] == 0 || _plateau[posGaucheB] == 3 || _plateau[posGaucheB] == 6 || _plateau[posGaucheB] == 7) // si case vide ou joueur ou bombe
             /* if(decalageLargeurB < decalageGB || decalageLargeurB > decalageDH) */ _joueurB.x -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_s])
         /* Collision en bas du joueur */
-        if(_plateau[posBasB] == 0 || _plateau[posBasB] == 3 || _plateau[posBasB] == 6) // si case vide ou joueur ou bombe
+        if(_plateau[posBasB] == 0 || _plateau[posBasB] == 3 || _plateau[posBasB] == 6 || _plateau[posBasB] == 7) // si case vide ou joueur ou bombe
                 /* if(decalageLongueurB < decalageGB || decalageLongueurB > decalageDH) */ _joueurB.z += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_SPACE]) {
         _vkeyboard[VK_SPACE] = 0; // on évite de spam la pose de bombe
         if(_joueurB.bombe == 0) {
-            _joueurB.bombe = 1;
+            _joueurB.bombe = (int)t + 1;
+            _joueurB.bombePos = posJoueurB;
             if(_debug) printf("Joueur B pose une bombe!\n");
-            _plateau[posJoueurB] = 6;
+            _plateau[posJoueurB] = 7;
         }
+    }
+
+    if((int)(t - (_joueurB.bombe - 1)) / 1000 > 3) { // quand la bombe doit explosé
+        _joueurB.bombe = 0; // remet le timer à 0
+        _plateau[_joueurB.bombePos] = 0; // vide le plateau de la bombe
+        _joueurB.bombePos = -1; // supprime l'ancienne location de la bombe
     }
 
     /* Affichage Debug */
@@ -401,7 +415,7 @@ void idle(void) {
     }
 
     /* Anti-collision entre joueurs */
-    if(_joueurB.position != posJoueurB && _plateau[posJoueurB] != 6 && _plateau[_joueurB.position] != 6) { // si position différente et pas une bombe
+    if(_joueurB.position != posJoueurB && _plateau[posJoueurB] != 6 && _plateau[_joueurB.position] != 6 && _plateau[posJoueurB] != 7 && _plateau[_joueurB.position] != 7) { // si position différente et pas une bombe
         _plateau[_joueurB.position] = 0; // on met l'ancienne position a un bloc vide
         _joueurB.position = posJoueurB; // on change la position dans perso_t
         _plateau[posJoueurB] = 3; // on met a jour le plateau
@@ -410,12 +424,16 @@ void idle(void) {
 
 /*!\brief Fonction appelée à chaque display. */
 void draw(void) {
+    double t = gl4dGetElapsedTime();
+
     vec4 couleurMur          = { 0.2, 0.2,  0.2, 1}, /* Gris */
          couleurJoueurA      = {0.15, 0.5, 0.15, 1}, /* Vert */
          couleurJoueurB      = { 0.2, 0.2,  0.7, 1}, /* Bleu */
          couleurMurExterieur = { 0.1, 0.1,  0.1, 1}, /* Gris foncé */
          couleurBois         = { 0.6, 0.3,    0, 1}, /* Marron */
-         couleurBombe        = {   1,   0,    0, 1}; /* Rouge */
+         couleurBombeN       = { 0.2, 0.1,    0, 1}, /* Noir */
+         couleurBombeO       = {   1, 0.4,  0.1, 1}, /* Orange */
+         couleurBombeR       = {   1,   0,    0, 1}; /* Rouge */
 
     float model_view_matrix[16], projection_matrix[16], nmv[16];
 
@@ -475,9 +493,32 @@ void draw(void) {
                 scale(nmv, _cubeSize / 2.6f, _cubeSize / 2.6f, _cubeSize / 2.6f);
                 transform_n_rasterize(_cubeBois, nmv, projection_matrix);
             }
-            /* Bombe */
+            /* Bombe A */
             if(_plateau[i * _grilleW + j] == 6) {
-                _sphere->dcolor = couleurBombe;
+                int temps = (int)(t - (_joueurA.bombe - 1)) / 1000;
+                if(temps <= 1) {
+                    _sphere->dcolor = couleurBombeN;
+                } else if(temps <= 2) {
+                    _sphere->dcolor = couleurBombeO;
+                } else
+                    _sphere->dcolor = couleurBombeR;
+                /* copie model_view_matrix dans nmv */
+                memcpy(nmv, model_view_matrix, sizeof(nmv));
+
+                /* pour convertir les posdonnées i, j de la grille en x, z du monde */
+                translate(nmv, _cubeSize * j + cX, 0.f, _cubeSize * i + cZ);
+                scale(nmv, _cubeSize / 3.f, _cubeSize / 3.f, _cubeSize / 3.f);
+                transform_n_rasterize(_sphere, nmv, projection_matrix);
+            }
+            /* Bombe B */
+            if(_plateau[i * _grilleW + j] == 7) {
+                int temps = (int)(t - (_joueurB.bombe - 1)) / 1000;
+                if(temps <= 1) {
+                    _sphere->dcolor = couleurBombeN;
+                } else if(temps <= 2) {
+                    _sphere->dcolor = couleurBombeO;
+                } else
+                    _sphere->dcolor = couleurBombeR;
                 /* copie model_view_matrix dans nmv */
                 memcpy(nmv, model_view_matrix, sizeof(nmv));
 
