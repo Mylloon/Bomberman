@@ -157,7 +157,7 @@ void init(void) {
 
     /* Placement des joueurs */
     // TODO... les faires relativement éloignes l'un de l'autre
-    int coefEloignement = _grilleW * 1.1;
+    int coefEloignement = _grilleW * 1.05;
 
     /* Joueur A */
     _joueurA.x += coefEloignement;
@@ -174,61 +174,65 @@ void init(void) {
     }
 
     /* Génération du plateau */
-    int _curseur = 0;
     for(int i = 0; i < _grilleH; i++)
         for(int j = 0; j < _grilleW; j++) {
+            int _case = i * _grilleH + j;
             if (i == 0) { // mur en haut
-                _plateau[_curseur] = 1;
-                _curseur++;
+                _plateau[_case] = 1;
                 continue;
             }
             if (i == (_grilleH - 1)) { // mur en bas
-                _plateau[_curseur] = 1;
-                _curseur++;
+                _plateau[_case] = 1;
                 continue;
             }
             if (j == 0) { // mur a gauche
-                _plateau[_curseur] = 1;
-                _curseur++;
+                _plateau[_case] = 1;
                 continue;
             }
             if (j == (_grilleW - 1)) { // mur a droite
-                _plateau[_curseur] = 1;
-                _curseur++;
+                _plateau[_case] = 1;
                 continue;
             }
             if ((j % 2) == 0 && (i % 2) == 0) { // mur à l'intérieur
-                _plateau[_curseur] = 1;
-                _curseur++;
+                _plateau[_case] = 1;
                 continue;
             }
-            _plateau[_curseur] = 0;
-            _curseur++;
+            _plateau[_case] = 0;
         }
 
+    /* On ajoute les blocs qui sont déstructibles par les joueurs */
+    for(int i = 0; i < _grilleH; i++)
+        for(int j = 0; j < _grilleW; j++) {
+            int _case = i * _grilleH + j;
+            if(_plateau[_case] == 0)
+                if(rand() % 2)
+                    _plateau[_case] = 4;
+        }
 
     /* On s'assure que au moins une cases autours du joueurs sont libre
      * ça donne ça :
-     * 0 0 0
-     * 0 x 0
-     * 0 0 0 */
+     * A B C
+     * D x E
+     * F G H
+     * avec A B C D E F G H des positions
+     * et x le joueur */
 
     int caseJoueurA = round((_joueurA.z + _cubeSize * _grilleH / 2) / _cubeSize) * _grilleH + round((_joueurA.x + _cubeSize * _grilleW / 2) / _cubeSize);
     int caseJoueurB = round((_joueurB.z + _cubeSize * _grilleH / 2) / _cubeSize) * _grilleH + round((_joueurB.x + _cubeSize * _grilleW / 2) / _cubeSize);
-    for(int i = 1; i <= 2; i++) { /* Attention au bordures !
+    for(int i = 0; i <= 2; i++) { /* Attention au bordures !
                                    * On les fait spawn loin des bordures
                                    * pour éviter tout problèmes. */
         /* Joueur A */
-        _plateau[caseJoueurA - i] = 0; // gauche
-        _plateau[caseJoueurA + i] = 0; // droite
-        _plateau[caseJoueurA - _grilleW - i] = 0; // haut
-        _plateau[caseJoueurA + _grilleW + i] = 0; // bas
+        _plateau[caseJoueurA - i] = 0; // D
+        _plateau[caseJoueurA + i] = 0; // E
+        _plateau[caseJoueurA - _grilleW - i] = 0; // B
+        _plateau[caseJoueurA + _grilleW + i] = 0; // G
 
         /* Joueur B */
-        _plateau[caseJoueurB - i] = 0; // gauche
-        _plateau[caseJoueurB + i] = 0; // droite
-        _plateau[caseJoueurB - _grilleW - i] = 0; // haut
-        _plateau[caseJoueurB + _grilleW + i] = 0; // bas
+        _plateau[caseJoueurB - i] = 0; // D
+        _plateau[caseJoueurB + i] = 0; // E
+        _plateau[caseJoueurB - _grilleW - i] = 0; // B
+        _plateau[caseJoueurB + _grilleW + i] = 0; // G
     }
 
     /* Mets en place la fonction à appeler en cas de sortie */
@@ -349,10 +353,10 @@ void idle(void) {
 
 /*!\brief Fonction appelée à chaque display. */
 void draw(void) {
-    vec4 couleurPlateau = {0.2, 0.2, 0.2, 1} /* Gris */,
-         couleurJoueurA  = {0.15, 0.5, 0.15, 1} /* Vert */,
-         couleurJoueurB  = {0.2, 0.2, 0.7, 1} /* Bleu */,
-         couleurBois    = {0.6, 0.3, 0, 0} /* Marron */;
+    vec4 couleurPlateau = {0.2, 0.2, 0.2, 1},   /* Gris */
+         couleurJoueurA = {0.15, 0.5, 0.15, 1}, /* Vert */
+         couleurJoueurB = {0.2, 0.2, 0.7, 1},   /* Bleu */
+         couleurBois    = {0.6, 0.3, 0, 0};     /* Marron */
 
     float model_view_matrix[16], projection_matrix[16], nmv[16];
 
@@ -398,7 +402,7 @@ void draw(void) {
 
                 /* pour convertir les coordonnées i, j de la grille en x, z du monde */
                 translate(nmv, _cubeSize * j + cX, 0.0f, _cubeSize * i + cZ);
-                scale(nmv, _cubeSize / 2.0f, _cubeSize / 2.0f, _cubeSize / 2.0f);
+                scale(nmv, _cubeSize / 2.6f, _cubeSize / 2.6f, _cubeSize / 2.6f);
                 transform_n_rasterize(_cube, nmv, projection_matrix);
             }
         }
