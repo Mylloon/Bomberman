@@ -93,7 +93,7 @@ enum {
     VK_SIZEOF
 };
 
-int _vkeyboard[VK_SIZEOF] = {0, 0, 0, 0, 0, 0, 0, 0};
+int _vkeyboard[VK_SIZEOF] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 /*!\brief Paramètre l'application et lance la boucle infinie. */
 int main(int argc, char ** argv) {
@@ -183,7 +183,6 @@ void init(void) {
 
     if((_plateau = malloc((_plateauW * _plateauH) * sizeof(int))) == NULL) {
         printf("Impossible d'allouer de la mémoire supplémentaire pour générer le plateau.\n");
-        sortie();
         exit(1);
     }
 
@@ -389,7 +388,6 @@ void idle(void) {
                     if(mort == 3) printf("TERMINÉ ! TOUT LE MONDE À PERDU !\n");
                     else printf("TERMINÉ ! JOUEUR %c À GAGNÉ !\n", joueur);
                     sortie();
-                    exit(0);
                 }
             }
 
@@ -505,7 +503,6 @@ void idle(void) {
                     if(mort == 3) printf("TERMINÉ ! TOUT LE MONDE À PERDU !\n");
                     else printf("TERMINÉ ! JOUEUR %c À GAGNÉ !\n", joueur);
                     sortie();
-                    exit(0);
                 }
             }
 
@@ -815,4 +812,6 @@ void sortie(void) {
     /* Libère tous les objets produits par GL4Dummies, ici
      * principalement le screen */
     gl4duClean(GL4DU_ALL);
+
+    exit(0);
 }
