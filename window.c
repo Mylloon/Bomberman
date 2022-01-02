@@ -100,7 +100,7 @@ int main(int argc, char ** argv) {
     /* Tentative de création d'une fenêtre pour GL4Dummies */
     if(!gl4duwCreateWindow(argc, argv, /* args du programme */
              "Bomberman ⋅ A. KENNEL L2-A", /* titre */
-             10, 10, 800, 600, /* x, y, largeur, heuteur */
+             10, 10, 800, 600, /* x, y, largeur, hauteur */
              GL4DW_SHOWN) /* état visible */) {
         /* Ici si échec de la création souvent lié à un problème d'absence
          * de contexte graphique ou d'impossibilité d'ouverture d'un
