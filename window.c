@@ -46,7 +46,7 @@ static int _debug = 0;
  * 2 (valeur reservée) -> Joueur A (défini automatiquement par le programme)
  * 3 (valeur reservée) -> Joueur B (défini automatiquement par le programme)
  * 4 -> Bloc destructible */
-static int * _grille = NULL;
+static int * _plateau = NULL;
 
 /*!\brief Largeur/Nombre de lignes de la grille */
 static int _grilleW;
@@ -147,50 +147,53 @@ void init(void) {
     /* Si _use_vsync != 0, on active la synchronisation verticale */
     SDL_GL_SetSwapInterval(_use_vsync);
 
-    /* Génération du plateau */
+    /* Génération du plateau
+     * et placement des joueurs */
     srand(time(NULL));
 
-    /* TODO
-     * Éloigner les spawns des joueurs */
-
+    /* Génération des dimensions du plateau */
     _grilleW = 15 + (rand() % 10);
     _grilleH = _grilleW;
 
-    if ((_grille = malloc((_grilleW * _grilleH) * sizeof(int))) == NULL) {
+    /* Placement des joueurs */
+    // TODO... les faires relativement éloignes l'un de l'autre
+
+    if ((_plateau = malloc((_grilleW * _grilleH) * sizeof(int))) == NULL) {
         printf("Impossible d'allouer de la mémoire supplémentaire pour générer le plateau.\n");
         sortie();
         exit(1);
     }
 
+    /* Génération du plateau */
     int _curseur = 0;
     for(int i = 0; i < _grilleH; i++)
         for(int j = 0; j < _grilleW; j++) {
             if (i == 0) { // mur en haut
-                _grille[_curseur] = 1;
+                _plateau[_curseur] = 1;
                 _curseur++;
                 continue;
             }
             if (i == (_grilleH - 1)) { // mur en bas
-                _grille[_curseur] = 1;
+                _plateau[_curseur] = 1;
                 _curseur++;
                 continue;
             }
             if (j == 0) { // mur a gauche
-                _grille[_curseur] = 1;
+                _plateau[_curseur] = 1;
                 _curseur++;
                 continue;
             }
             if (j == (_grilleW - 1)) { // mur a droite
-                _grille[_curseur] = 1;
+                _plateau[_curseur] = 1;
                 _curseur++;
                 continue;
             }
             if ((j % 2) == 0 && (i % 2) == 0) { // mur à l'intérieur
-                _grille[_curseur] = 1;
+                _plateau[_curseur] = 1;
                 _curseur++;
                 continue;
             }
-            _grille[_curseur] = 0;
+            _plateau[_curseur] = 0;
             _curseur++;
         }
 
@@ -205,16 +208,16 @@ void init(void) {
     int caseJoueurB = round((_herosB.z + _cubeSize * _grilleH / 2) / _cubeSize) * _grilleH + round((_herosB.x + _cubeSize * _grilleW / 2) / _cubeSize);
     for (int i = 1; i <= 2; i++) { // attention au bordures
         /* Joueur A */
-        _grille[caseJoueurA - i] = 0; // gauche
-        _grille[caseJoueurA + i] = 0; // droite
-        _grille[caseJoueurA - _grilleW - i] = 0; // haut
-        _grille[caseJoueurA + _grilleW + i] = 0; // bas
+        _plateau[caseJoueurA - i] = 0; // gauche
+        _plateau[caseJoueurA + i] = 0; // droite
+        _plateau[caseJoueurA - _grilleW - i] = 0; // haut
+        _plateau[caseJoueurA + _grilleW + i] = 0; // bas
 
         /* Joueur B */
-        _grille[caseJoueurB - i] = 0; // gauche
-        _grille[caseJoueurB + i] = 0; // droite
-        _grille[caseJoueurB - _grilleW - i] = 0; // haut
-        _grille[caseJoueurB + _grilleW + i] = 0; // bas
+        _plateau[caseJoueurB - i] = 0; // gauche
+        _plateau[caseJoueurB + i] = 0; // droite
+        _plateau[caseJoueurB - _grilleW - i] = 0; // haut
+        _plateau[caseJoueurB + _grilleW + i] = 0; // bas
     }
 
     /* Mets en place la fonction à appeler en cas de sortie */
@@ -256,16 +259,16 @@ void idle(void) {
 
     /* Déplacement */
     if(_vkeyboard[VK_RIGHT])
-        if((_grille[coorDroiteA] == 0 || _grille[coorDroiteA] == 2) && (decalageLargeurA < decalageGB || decalageLargeurA > decalageDH)) // collision à droite du plateau
+        if((_plateau[coorDroiteA] == 0 || _plateau[coorDroiteA] == 2) && (decalageLargeurA < decalageGB || decalageLargeurA > decalageDH)) // collision à droite du plateau
             _herosA.x += vitesse * dt;
     if(_vkeyboard[VK_UP])
-        if((_grille[coorHautA] == 0 || _grille[coorHautA] == 2) && (decalageLongueurA < decalageGB || decalageLongueurA > decalageDH)) // collision en haut du plateau
+        if((_plateau[coorHautA] == 0 || _plateau[coorHautA] == 2) && (decalageLongueurA < decalageGB || decalageLongueurA > decalageDH)) // collision en haut du plateau
             _herosA.z -= vitesse * dt;
     if(_vkeyboard[VK_LEFT])
-        if((_grille[coorGaucheA] == 0 || _grille[coorGaucheA] == 2) && (decalageLargeurA < decalageGB || decalageLargeurA > decalageDH)) // collision à gauche du plateau
+        if((_plateau[coorGaucheA] == 0 || _plateau[coorGaucheA] == 2) && (decalageLargeurA < decalageGB || decalageLargeurA > decalageDH)) // collision à gauche du plateau
             _herosA.x -= vitesse * dt;
     if(_vkeyboard[VK_DOWN])
-        if((_grille[coorBasA] == 0 || _grille[coorBasA] == 2) && (decalageLongueurA < decalageGB || decalageLongueurA > decalageDH)) // collision en bas du plateau
+        if((_plateau[coorBasA] == 0 || _plateau[coorBasA] == 2) && (decalageLongueurA < decalageGB || decalageLongueurA > decalageDH)) // collision en bas du plateau
             _herosA.z += vitesse * dt;
 
     /* Affichage Debug */
@@ -279,9 +282,9 @@ void idle(void) {
     /* Anti-collision entre joueurs */
     if(_herosA.position != coorJoueurA) {
         if(_herosA.position != -1)
-            _grille[_herosA.position] = 0;
+            _plateau[_herosA.position] = 0;
         _herosA.position = coorJoueurA;
-        _grille[coorJoueurA] = 2;
+        _plateau[coorJoueurA] = 2;
     }
 
 
@@ -303,16 +306,16 @@ void idle(void) {
 
     /* Déplacement */
     if(_vkeyboard[VK_d])
-        if((_grille[coorDroiteB] == 0 || _grille[coorDroiteB] == 3) && (decalageLargeurB < decalageGB || decalageLargeurB > decalageDH)) // collision à droite du plateau
+        if((_plateau[coorDroiteB] == 0 || _plateau[coorDroiteB] == 3) && (decalageLargeurB < decalageGB || decalageLargeurB > decalageDH)) // collision à droite du plateau
             _herosB.x += vitesse * dt;
     if(_vkeyboard[VK_z])
-        if((_grille[coorHautB] == 0 || _grille[coorHautB] == 3) && (decalageLongueurB < decalageGB || decalageLongueurB > decalageDH)) // collision en haut du plateau
+        if((_plateau[coorHautB] == 0 || _plateau[coorHautB] == 3) && (decalageLongueurB < decalageGB || decalageLongueurB > decalageDH)) // collision en haut du plateau
             _herosB.z -= vitesse * dt;
     if(_vkeyboard[VK_q])
-        if((_grille[coorGaucheB] == 0 || _grille[coorGaucheB] == 3) && (decalageLargeurB < decalageGB || decalageLargeurB > decalageDH)) // collision à gauche du plateau
+        if((_plateau[coorGaucheB] == 0 || _plateau[coorGaucheB] == 3) && (decalageLargeurB < decalageGB || decalageLargeurB > decalageDH)) // collision à gauche du plateau
             _herosB.x -= vitesse * dt;
     if(_vkeyboard[VK_s])
-        if((_grille[coorBasB] == 0 || _grille[coorBasB] == 3) && (decalageLongueurB < decalageGB || decalageLongueurB > decalageDH)) // collision en bas du plateau
+        if((_plateau[coorBasB] == 0 || _plateau[coorBasB] == 3) && (decalageLongueurB < decalageGB || decalageLongueurB > decalageDH)) // collision en bas du plateau
             _herosB.z += vitesse * dt;
 
     /* Affichage Debug */
@@ -327,9 +330,9 @@ void idle(void) {
     /* Anti-collision entre joueurs */
     if(_herosB.position != coorJoueurB) {
         if(_herosB.position != -1)
-            _grille[_herosB.position] = 0;
+            _plateau[_herosB.position] = 0;
         _herosB.position = coorJoueurB;
-        _grille[coorJoueurB] = 3;
+        _plateau[coorJoueurB] = 3;
     }
 }
 
@@ -366,7 +369,7 @@ void draw(void) {
     for(int i = 0; i < _grilleW; ++i)
         for(int j = 0; j < _grilleH; ++j) {
             /* Bloc simple */
-            if(_grille[i * _grilleW + j] == 1) {
+            if(_plateau[i * _grilleW + j] == 1) {
                 _cube->dcolor = couleurPlateau;
                 /* copie model_view_matrix dans nmv */
                 memcpy(nmv, model_view_matrix, sizeof(nmv));
@@ -377,7 +380,7 @@ void draw(void) {
                 transform_n_rasterize(_cube, nmv, projection_matrix);
             }
             /* Bloc destructible */
-            if(_grille[i * _grilleW + j] == 4) {
+            if(_plateau[i * _grilleW + j] == 4) {
                 _cube->dcolor = couleurBois;
                 /* copie model_view_matrix dans nmv */
                 memcpy(nmv, model_view_matrix, sizeof(nmv));
