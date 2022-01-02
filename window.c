@@ -63,18 +63,18 @@ typedef struct perso_t {
 } perso_t;
 
 /* Définition de nos deux joueurs */
-perso_t _herosA = { 0.f, 0.f, 0.f, -1 }; // à droite
-perso_t _herosB = { 0.f, 0.f, 6.f, -1 }; // à gauche
+perso_t _joueurA = { 0.f, 0.f, 0.f, -1 }; // à droite
+perso_t _joueurB = { 0.f, 0.f, 6.f, -1 }; // à gauche
 
 /* Clavier virtuel */
 enum {
-    /* Héros A */
+    /* Joueur A */
     VK_RIGHT = 0,
     VK_UP,
     VK_LEFT,
     VK_DOWN,
 
-    /* Héros B */
+    /* Joueur B */
     VK_d,
     VK_z,
     VK_q,
@@ -157,6 +157,15 @@ void init(void) {
 
     /* Placement des joueurs */
     // TODO... les faires relativement éloignes l'un de l'autre
+    int coefEloignement = _grilleW * 1.1;
+
+    /* Joueur A */
+    _joueurA.x += coefEloignement;
+    _joueurA.z += coefEloignement;
+
+    /* Joueur B */
+    _joueurB.x -= coefEloignement;
+    _joueurB.z -= coefEloignement;
 
     if ((_plateau = malloc((_grilleW * _grilleH) * sizeof(int))) == NULL) {
         printf("Impossible d'allouer de la mémoire supplémentaire pour générer le plateau.\n");
@@ -204,9 +213,11 @@ void init(void) {
      * 0 x 0
      * 0 0 0 */
 
-    int caseJoueurA = round((_herosA.z + _cubeSize * _grilleH / 2) / _cubeSize) * _grilleH + round((_herosA.x + _cubeSize * _grilleW / 2) / _cubeSize);
-    int caseJoueurB = round((_herosB.z + _cubeSize * _grilleH / 2) / _cubeSize) * _grilleH + round((_herosB.x + _cubeSize * _grilleW / 2) / _cubeSize);
-    for (int i = 1; i <= 2; i++) { // attention au bordures
+    int caseJoueurA = round((_joueurA.z + _cubeSize * _grilleH / 2) / _cubeSize) * _grilleH + round((_joueurA.x + _cubeSize * _grilleW / 2) / _cubeSize);
+    int caseJoueurB = round((_joueurB.z + _cubeSize * _grilleH / 2) / _cubeSize) * _grilleH + round((_joueurB.x + _cubeSize * _grilleW / 2) / _cubeSize);
+    for(int i = 1; i <= 2; i++) { /* Attention au bordures !
+                                   * On les fait spawn loin des bordures
+                                   * pour éviter tout problèmes. */
         /* Joueur A */
         _plateau[caseJoueurA - i] = 0; // gauche
         _plateau[caseJoueurA + i] = 0; // droite
@@ -241,10 +252,10 @@ void idle(void) {
     float decalageGB = .0f + decalageAutorisee; // décalage pour la gauche et le bas
     float decalageDH = 1.f - decalageAutorisee; // décalage pour la droite et le haut
 
-    /* Mouvements du héros A */
+    /* Mouvements du Joueur A */
     /* Coordonées x, z */
-    float zA = (_herosA.z + _cubeSize * _grilleH / 2) / _cubeSize; // ligne   - hauteur
-    float xA = (_herosA.x + _cubeSize * _grilleW / 2) / _cubeSize; // colonne - longueur
+    float zA = (_joueurA.z + _cubeSize * _grilleH / 2) / _cubeSize; // ligne   - hauteur
+    float xA = (_joueurA.x + _cubeSize * _grilleW / 2) / _cubeSize; // colonne - longueur
 
     /* Coordonnées joueur A */
     int coorJoueurA = round(zA) * _grilleH + round(xA);
@@ -260,38 +271,38 @@ void idle(void) {
     /* Déplacement */
     if(_vkeyboard[VK_RIGHT])
         if((_plateau[coorDroiteA] == 0 || _plateau[coorDroiteA] == 2) && (decalageLargeurA < decalageGB || decalageLargeurA > decalageDH)) // collision à droite du plateau
-            _herosA.x += vitesse * dt;
+            _joueurA.x += vitesse * dt;
     if(_vkeyboard[VK_UP])
         if((_plateau[coorHautA] == 0 || _plateau[coorHautA] == 2) && (decalageLongueurA < decalageGB || decalageLongueurA > decalageDH)) // collision en haut du plateau
-            _herosA.z -= vitesse * dt;
+            _joueurA.z -= vitesse * dt;
     if(_vkeyboard[VK_LEFT])
         if((_plateau[coorGaucheA] == 0 || _plateau[coorGaucheA] == 2) && (decalageLargeurA < decalageGB || decalageLargeurA > decalageDH)) // collision à gauche du plateau
-            _herosA.x -= vitesse * dt;
+            _joueurA.x -= vitesse * dt;
     if(_vkeyboard[VK_DOWN])
         if((_plateau[coorBasA] == 0 || _plateau[coorBasA] == 2) && (decalageLongueurA < decalageGB || decalageLongueurA > decalageDH)) // collision en bas du plateau
-            _herosA.z += vitesse * dt;
+            _joueurA.z += vitesse * dt;
 
     /* Affichage Debug */
     if(_debug) {
-        printf("\n========= Héros A =========\n");
-        printf(" li = %d, col = %d, idx = %d\n", (int)(zA + .5f), (int)(xA + .5f), _herosA.position);
+        printf("\n========== Joueur A ==========\n");
+        printf(" li = %d, col = %d, idx = %d\n", (int)(zA + .5f), (int)(xA + .5f), _joueurA.position);
         printf(" zA=%f xA=%f\n", zA, xA);
         printf(" d=%d h=%d g=%d b=%d\n", coorDroiteA, coorHautA, coorGaucheA, coorBasA);
     }
 
     /* Anti-collision entre joueurs */
-    if(_herosA.position != coorJoueurA) {
-        if(_herosA.position != -1)
-            _plateau[_herosA.position] = 0;
-        _herosA.position = coorJoueurA;
+    if(_joueurA.position != coorJoueurA) {
+        if(_joueurA.position != -1)
+            _plateau[_joueurA.position] = 0;
+        _joueurA.position = coorJoueurA;
         _plateau[coorJoueurA] = 2;
     }
 
 
-    /* Mouvements du héros B */
+    /* Mouvements du Joueur B */
     /* Coordonées x, z */
-    float zB = (float)((_herosB.z + _cubeSize * _grilleH / 2) / _cubeSize); // ligne - hauteur
-    float xB = (float)((_herosB.x + _cubeSize * _grilleW / 2) / _cubeSize); // colonne - longueur
+    float zB = (float)((_joueurB.z + _cubeSize * _grilleH / 2) / _cubeSize); // ligne - hauteur
+    float xB = (float)((_joueurB.x + _cubeSize * _grilleW / 2) / _cubeSize); // colonne - longueur
 
     /* Coordonnées joueur A */
     int coorJoueurB = round(zB) * _grilleH + round(xB);
@@ -307,31 +318,31 @@ void idle(void) {
     /* Déplacement */
     if(_vkeyboard[VK_d])
         if((_plateau[coorDroiteB] == 0 || _plateau[coorDroiteB] == 3) && (decalageLargeurB < decalageGB || decalageLargeurB > decalageDH)) // collision à droite du plateau
-            _herosB.x += vitesse * dt;
+            _joueurB.x += vitesse * dt;
     if(_vkeyboard[VK_z])
         if((_plateau[coorHautB] == 0 || _plateau[coorHautB] == 3) && (decalageLongueurB < decalageGB || decalageLongueurB > decalageDH)) // collision en haut du plateau
-            _herosB.z -= vitesse * dt;
+            _joueurB.z -= vitesse * dt;
     if(_vkeyboard[VK_q])
         if((_plateau[coorGaucheB] == 0 || _plateau[coorGaucheB] == 3) && (decalageLargeurB < decalageGB || decalageLargeurB > decalageDH)) // collision à gauche du plateau
-            _herosB.x -= vitesse * dt;
+            _joueurB.x -= vitesse * dt;
     if(_vkeyboard[VK_s])
         if((_plateau[coorBasB] == 0 || _plateau[coorBasB] == 3) && (decalageLongueurB < decalageGB || decalageLongueurB > decalageDH)) // collision en bas du plateau
-            _herosB.z += vitesse * dt;
+            _joueurB.z += vitesse * dt;
 
     /* Affichage Debug */
     if(_debug) {
-        printf("========= Héros B =========\n");
-        printf(" li = %d, col = %d, idx = %d\n", (int)(zB + .5f), (int)(xB + .5f), _herosB.position);
+        printf("========== Joueur B ==========\n");
+        printf(" li = %d, col = %d, idx = %d\n", (int)(zB + .5f), (int)(xB + .5f), _joueurB.position);
         printf(" zA=%f xA=%f\n", zB, xB);
         printf(" d=%d h=%d g=%d b=%d\n", coorDroiteB, coorHautB, coorGaucheB, coorBasB);
-        printf("===========================\n");
+        printf("===============================\n");
     }
 
     /* Anti-collision entre joueurs */
-    if(_herosB.position != coorJoueurB) {
-        if(_herosB.position != -1)
-            _plateau[_herosB.position] = 0;
-        _herosB.position = coorJoueurB;
+    if(_joueurB.position != coorJoueurB) {
+        if(_joueurB.position != -1)
+            _plateau[_joueurB.position] = 0;
+        _joueurB.position = coorJoueurB;
         _plateau[coorJoueurB] = 3;
     }
 }
@@ -339,8 +350,8 @@ void idle(void) {
 /*!\brief Fonction appelée à chaque display. */
 void draw(void) {
     vec4 couleurPlateau = {0.2, 0.2, 0.2, 1} /* Gris */,
-         couleurHerosA  = {0.15, 0.5, 0.15, 1} /* Vert */,
-         couleurHerosB  = {0.2, 0.2, 0.7, 1} /* Bleu */,
+         couleurJoueurA  = {0.15, 0.5, 0.15, 1} /* Vert */,
+         couleurJoueurB  = {0.2, 0.2, 0.7, 1} /* Bleu */,
          couleurBois    = {0.6, 0.3, 0, 0} /* Marron */;
 
     float model_view_matrix[16], projection_matrix[16], nmv[16];
@@ -392,24 +403,24 @@ void draw(void) {
             }
         }
 
-    /* Dessine le héros A */
-    _cube->dcolor = couleurHerosA;
-    _sphere->dcolor = couleurHerosA;
+    /* Dessine le Joueur A */
+    _cube->dcolor = couleurJoueurA;
+    _sphere->dcolor = couleurJoueurA;
     memcpy(nmv, model_view_matrix, sizeof(nmv));
     /* Corps */
-    translate(nmv, _herosA.x, _herosA.y, _herosA.z);
+    translate(nmv, _joueurA.x, _joueurA.y, _joueurA.z);
     scale(nmv, _cubeSize / 3.0f, _cubeSize / 3.0f, _cubeSize / 3.0f);
     transform_n_rasterize(_cube, nmv, projection_matrix);
     /* Tête */
     translate(nmv, 0.0f, 2.0f, 0.0f);
     transform_n_rasterize(_sphere, nmv, projection_matrix);
 
-    /* Dessine le héros B */
-    _cube->dcolor = couleurHerosB;
-    _sphere->dcolor = couleurHerosB;
+    /* Dessine le Joueur B */
+    _cube->dcolor = couleurJoueurB;
+    _sphere->dcolor = couleurJoueurB;
     memcpy(nmv, model_view_matrix, sizeof(nmv));
     /* Corps */
-    translate(nmv, _herosB.x, _herosB.y, _herosB.z);
+    translate(nmv, _joueurB.x, _joueurB.y, _joueurB.z);
     scale(nmv, _cubeSize / 3.0f, _cubeSize / 3.0f, _cubeSize / 3.0f);
     transform_n_rasterize(_cube, nmv, projection_matrix);
     /* Tête */
@@ -440,7 +451,7 @@ void keyd(int keycode) {
             _debug = !_debug;
             break;
 
-        /* Héros A */
+        /* Joueur A */
         case GL4DK_RIGHT:
             _vkeyboard[VK_RIGHT] = 1;
             break;
@@ -457,7 +468,7 @@ void keyd(int keycode) {
             _vkeyboard[VK_DOWN] = 1;
             break;
 
-        /* Héros B */
+        /* Joueur B */
         case GL4DK_d:
             _vkeyboard[VK_d] = 1;
             break;
@@ -482,7 +493,7 @@ void keyd(int keycode) {
 /*!\brief Intercepte l'évènement clavier pour modifier les options (au relâchement d'une touche). */
 void keyu(int keycode) {
     switch(keycode) {
-        /* Cas où l'héros A on arrête de bouger */
+        /* Cas où l'Joueur A on arrête de bouger */
         case GL4DK_RIGHT:
             _vkeyboard[VK_RIGHT] = 0;
             break;
@@ -499,7 +510,7 @@ void keyu(int keycode) {
             _vkeyboard[VK_DOWN] = 0;
             break;
 
-        /* Cas où l'héros A on arrête de bouger */
+        /* Cas où l'Joueur A on arrête de bouger */
         case GL4DK_d:
             _vkeyboard[VK_d] = 0;
             break;
