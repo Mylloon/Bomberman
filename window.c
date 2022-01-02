@@ -296,35 +296,24 @@ void idle(void) {
      * On part de la coordonnées de droite car coorDroite = E. */
     if(_vkeyboard[VK_RIGHT])
         /* Collision à droite du joueur */
-        if(_plateau[coorDroiteA] == 0 || _plateau[coorDroiteA] == 2) { // si case vide ou joueur
-            if(_plateau[coorDroiteA + _grilleW + 1] == 1 || _plateau[coorDroiteA - _grilleW + 1] == 1) { // si mur
-                if(decalageLargeurA < decalageGB || decalageLargeurA > decalageDH) _joueurA.x += vitesse * dt; // on s'assure d'être aligné
-            } else _joueurA.x += vitesse * dt; // si pas de murs on avance
-        }
+        if(_plateau[coorDroiteA] == 0 || _plateau[coorDroiteA] == 2) // si case vide ou joueur
+            if(decalageLargeurA < decalageGB || decalageLargeurA > decalageDH) _joueurA.x += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_UP])
         /* Collision en haut du joueur */
-        if(_plateau[coorHautA] == 0 || _plateau[coorHautA] == 2) { // si case vide ou joueur
-            if(_plateau[coorHautA - _grilleW - 1] == 1 || _plateau[coorHautA - _grilleW + 1] == 1) { // si mur
-                if(decalageLongueurA < decalageGB || decalageLongueurA > decalageDH) _joueurA.z -= vitesse * dt; // on s'assure d'être aligné
-            } else _joueurA.z -= vitesse * dt; // si pas de murs on avance
-        }
+        if(_plateau[coorHautA] == 0 || _plateau[coorHautA] == 2) // si case vide ou joueur
+            if(decalageLongueurA < decalageGB || decalageLongueurA > decalageDH) _joueurA.z -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_LEFT])
         /* Collision à gauche du joueur */
-        if(_plateau[coorGaucheA] == 0 || _plateau[coorGaucheA] == 2) { // si case vide ou joueur
-            if(_plateau[coorGaucheA - _grilleW - 1] == 1 || _plateau[coorGaucheA + _grilleW - 1] == 1) { // si mur
-                if(decalageLargeurA < decalageGB || decalageLargeurA > decalageDH) _joueurA.x -= vitesse * dt; // on s'assure d'être aligné
-            } else _joueurA.x -= vitesse * dt; // si pas de murs on avance
-        }
+        if(_plateau[coorGaucheA] == 0 || _plateau[coorGaucheA] == 2) // si case vide ou joueur
+            if(decalageLargeurA < decalageGB || decalageLargeurA > decalageDH) _joueurA.x -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_DOWN])
         /* Collision en bas du joueur */
-        if(_plateau[coorBasA] == 0 || _plateau[coorBasA] == 2) { // si case vide ou joueur
-            if(_plateau[coorBasA + _grilleW - 1] == 1 || _plateau[coorBasA + _grilleW + 1] == 1) { // si mur
-                if(decalageLongueurA < decalageGB || decalageLongueurA > decalageDH) _joueurA.z += vitesse * dt; // on s'assure d'être aligné
-            } else _joueurA.z += vitesse * dt; // si pas de murs on avance
-        }
+        if(_plateau[coorBasA] == 0 || _plateau[coorBasA] == 2) // si case vide ou joueur
+            if(decalageLongueurA < decalageGB || decalageLongueurA > decalageDH) _joueurA.z += vitesse * dt; // on s'assure d'être aligné
+
     if(_vkeyboard[VK_RETURN]) {
         _vkeyboard[VK_RETURN] = 0; // on évite de spam la pose de bombe
         printf("Joueur A pose une bombe!\n"); // temp
@@ -366,35 +355,24 @@ void idle(void) {
     /* Déplacement */
     if(_vkeyboard[VK_d])
         /* Collision à droite du joueur */
-        if(_plateau[coorDroiteB] == 0 || _plateau[coorDroiteB] == 2) { // si case vide ou joueur
-            if(_plateau[coorDroiteB + _grilleW + 1] == 1 || _plateau[coorDroiteB - _grilleW + 1] == 1) { // si mur
-                if(decalageLargeurB < decalageGB || decalageLargeurB > decalageDH) _joueurB.x += vitesse * dt; // on s'assure d'être aligné
-            } else _joueurB.x += vitesse * dt; // si pas de murs on avance
-        }
+        if(_plateau[coorDroiteB] == 0 || _plateau[coorDroiteB] == 2) // si case vide ou joueur
+            if(decalageLargeurB < decalageGB || decalageLargeurB > decalageDH) _joueurB.x += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_s])
         /* Collision en haut du joueur */
-        if(_plateau[coorHautB] == 0 || _plateau[coorHautB] == 2) { // si case vide ou joueur
-            if(_plateau[coorHautB - _grilleW - 1] == 1 || _plateau[coorHautB - _grilleW + 1] == 1) { // si mur
-                if(decalageLongueurB < decalageGB || decalageLongueurB > decalageDH) _joueurB.z -= vitesse * dt; // on s'assure d'être aligné
-            } else _joueurB.z -= vitesse * dt; // si pas de murs on avance
-        }
+        if(_plateau[coorHautB] == 0 || _plateau[coorHautB] == 2) // si case vide ou joueur
+            if(decalageLongueurB < decalageGB || decalageLongueurB > decalageDH) _joueurB.z -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_q])
         /* Collision à gauche du joueur */
-        if(_plateau[coorGaucheB] == 0 || _plateau[coorGaucheB] == 2) { // si case vide ou joueur
-            if(_plateau[coorGaucheB - _grilleW - 1] == 1 || _plateau[coorGaucheB + _grilleW - 1] == 1) { // si mur
-                if(decalageLargeurB < decalageGB || decalageLargeurB > decalageDH) _joueurB.x -= vitesse * dt; // on s'assure d'être aligné
-            } else _joueurB.x -= vitesse * dt; // si pas de murs on avance
-        }
+        if(_plateau[coorGaucheB] == 0 || _plateau[coorGaucheB] == 2) // si case vide ou joueur
+            if(decalageLargeurB < decalageGB || decalageLargeurB > decalageDH) _joueurB.x -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_s])
         /* Collision en bas du joueur */
-        if(_plateau[coorBasB] == 0 || _plateau[coorBasB] == 2) { // si case vide ou joueur
-            if(_plateau[coorBasB + _grilleW - 1] == 1 || _plateau[coorBasB + _grilleW + 1] == 1) { // si mur
+        if(_plateau[coorBasB] == 0 || _plateau[coorBasB] == 2) // si case vide ou joueur
                 if(decalageLongueurB < decalageGB || decalageLongueurB > decalageDH) _joueurB.z += vitesse * dt; // on s'assure d'être aligné
-            } else _joueurB.z += vitesse * dt; // si pas de murs on avance
-        }
+
     if(_vkeyboard[VK_SPACE]) {
         _vkeyboard[VK_SPACE] = 0; // on évite de spam la pose de bombe
         printf("Joueur B pose une bombe!\n"); // temp
@@ -612,7 +590,7 @@ void keyu(int keycode) {
 /*!\brief Appeler à la sortie du programme
  * pour libérer les objets de la mémoire. */
 void sortie(void) {
-    /* on libère le cube */
+    /* On libère le cube */
     if(_cube) {
         free_surface(_cube);
         _cube = NULL;
@@ -622,13 +600,13 @@ void sortie(void) {
         _cubeBois = NULL;
     }
 
-    /* on libère la sphère */
+    /* On libère la sphère */
     if(_sphere) {
         free_surface(_sphere);
         _sphere = NULL;
     }
 
-    /* libère tous les objets produits par GL4Dummies, ici
-     * principalement les screen */
+    /* Libère tous les objets produits par GL4Dummies, ici
+     * principalement le screen */
     gl4duClean(GL4DU_ALL);
 }
