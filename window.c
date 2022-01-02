@@ -34,31 +34,37 @@ static float _cubeSize = 4.f;
 /*!\brief Surface représentant une sphère */
 static surface_t * _sphere = NULL;
 
-/* Variable d'état pour activer/désactiver la synchronisation verticale */
+/*!\brief Variable d'état pour activer/désactiver la synchronisation verticale */
 static int _use_vsync = 1;
 
-/* Variable d'état pour activer/désactiver le debug */
+/*!\brief Variable d'état pour activer/désactiver le debug */
 static int _debug = 0;
 
-/* Grille de positions où il y aura des cubes
+/*!\brief Grille de positions où il y aura des cubes
  * 0 -> Vide
  * 1 -> Mur
  * 2 (valeur reservée) -> Joueur A (défini automatiquement par le programme)
- * 3 (valeur reservée) -> Joueur B (défini automatiquement par le programme) */
+ * 3 (valeur reservée) -> Joueur B (défini automatiquement par le programme)
+ * 4 -> Bloc destructible */
 static int * _grille = NULL;
+
+/*!\brief Largeur/Nombre de lignes de la grille */
 static int _grilleW;
+
+/*!\brief Hauteur/Nombre de colonnes de la grille */
 static int _grilleH;
 
 /* Définition d'un personnage */
 typedef struct perso_t {
-    float x, y, z; // coordonées
-    int position; // position dans la grille
-    surface_t * perso; // objet
+    float x, y, z; /* Coordonées spatiale */
+    int position; /* Position dans la grille.
+                   * Permet d'éviter aux joueurs
+                   * de se rentrer dedans */
 } perso_t;
 
 /* Définition de nos deux joueurs */
-perso_t _herosA = { 4.f, 0.f, -6.f, -1, NULL }; // à droite
-perso_t _herosB = { -4.f, 0.f, -1.f, -1, NULL }; // à gauche
+perso_t _herosA = { 0.f, 0.f, 0.f, -1 }; // à droite
+perso_t _herosB = { 0.f, 0.f, 6.f, -1 }; // à gauche
 
 /* Clavier virtuel */
 enum {
@@ -145,11 +151,9 @@ void init(void) {
     srand(time(NULL));
 
     /* TODO
-     * Génération pour _grilleH aléatoire aussi
-     * Éloigner les spawns des joueurs
-     * Zoom de la caméra en fonction de la taille de la map */
+     * Éloigner les spawns des joueurs */
 
-    _grilleW = 10 + (rand() % 10);
+    _grilleW = 15 + (rand() % 10);
     _grilleH = _grilleW;
 
     if ((_grille = malloc((_grilleW * _grilleH) * sizeof(int))) == NULL) {
@@ -197,10 +201,8 @@ void init(void) {
      * 0 x 0
      * 0 0 0 */
 
-    // Coordonnées joueurs
     int caseJoueurA = round((_herosA.z + _cubeSize * _grilleH / 2) / _cubeSize) * _grilleH + round((_herosA.x + _cubeSize * _grilleW / 2) / _cubeSize);
     int caseJoueurB = round((_herosB.z + _cubeSize * _grilleH / 2) / _cubeSize) * _grilleH + round((_herosB.x + _cubeSize * _grilleW / 2) / _cubeSize);
-
     for (int i = 1; i <= 2; i++) { // attention au bordures
         /* Joueur A */
         _grille[caseJoueurA - i] = 0; // gauche
@@ -335,7 +337,8 @@ void idle(void) {
 void draw(void) {
     vec4 couleurPlateau = {0.2, 0.2, 0.2, 1} /* Gris */,
          couleurHerosA  = {0.15, 0.5, 0.15, 1} /* Vert */,
-         couleurHerosB  = {0.2, 0.2, 0.7, 1} /* Bleu */;
+         couleurHerosB  = {0.2, 0.2, 0.7, 1} /* Bleu */,
+         couleurBois    = {0.6, 0.3, 0, 0} /* Marron */;
 
     float model_view_matrix[16], projection_matrix[16], nmv[16];
 
@@ -351,20 +354,20 @@ void draw(void) {
     /* Charger la matrice identité dans model-view */
     MIDENTITY(model_view_matrix);
     /* On place la caméra en arrière-haut, elle regarde le centre de la scène */
-    lookAt(model_view_matrix, 0, 100 /* zoom */, 30 /* inclinaison */, 0, 0, 0, 0, 0, -1);
+    int coefTaille = -20 + _grilleW * 2.5;
+    lookAt(model_view_matrix, 0, 70 + coefTaille /* zoom */, 30 + coefTaille /* inclinaison */, 0, 0, 0, 0, 0, -1);
 
     /* Pour centrer la grille par rapport au monde */
     float cX = -_cubeSize * _grilleW / 2.0f;
     float cZ = -_cubeSize * _grilleH / 2.0f;
 
-    /* On change la couleur */
-    _cube->dcolor = couleurPlateau;
-
     /* Pour toutes les cases de la grille, afficher un cube quand il y a
      * un 1 dans la grille */
     for(int i = 0; i < _grilleW; ++i)
-        for(int j = 0; j < _grilleH; ++j)
+        for(int j = 0; j < _grilleH; ++j) {
+            /* Bloc simple */
             if(_grille[i * _grilleW + j] == 1) {
+                _cube->dcolor = couleurPlateau;
                 /* copie model_view_matrix dans nmv */
                 memcpy(nmv, model_view_matrix, sizeof(nmv));
 
@@ -373,6 +376,18 @@ void draw(void) {
                 scale(nmv, _cubeSize / 2.0f, _cubeSize / 2.0f, _cubeSize / 2.0f);
                 transform_n_rasterize(_cube, nmv, projection_matrix);
             }
+            /* Bloc destructible */
+            if(_grille[i * _grilleW + j] == 4) {
+                _cube->dcolor = couleurBois;
+                /* copie model_view_matrix dans nmv */
+                memcpy(nmv, model_view_matrix, sizeof(nmv));
+
+                /* pour convertir les coordonnées i, j de la grille en x, z du monde */
+                translate(nmv, _cubeSize * j + cX, 0.0f, _cubeSize * i + cZ);
+                scale(nmv, _cubeSize / 2.0f, _cubeSize / 2.0f, _cubeSize / 2.0f);
+                transform_n_rasterize(_cube, nmv, projection_matrix);
+            }
+        }
 
     /* Dessine le héros A */
     _cube->dcolor = couleurHerosA;
