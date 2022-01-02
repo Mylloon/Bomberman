@@ -582,7 +582,9 @@ void draw(void) {
 
                 /* pour convertir les posdonnées i, j de la grille en x, z du monde */
                 translate(nmv, _cubeSize * j + cX, 0.f, _cubeSize * i + cZ);
-                scale(nmv, _cubeSize / 3.f + (temps *1.5), _cubeSize / 3.f + (temps *1.5), _cubeSize / 3.f + (temps *1.5));
+                double coefExplosion = temps * 1.5;
+                if(temps < 2.8) coefExplosion = 1; // effet soudain
+                scale(nmv, _cubeSize / 3.f + coefExplosion, _cubeSize / 3.f + coefExplosion, _cubeSize / 3.f + coefExplosion);
                 transform_n_rasterize(_sphere, nmv, projection_matrix);
             }
             /* Bombe B */
@@ -598,7 +600,9 @@ void draw(void) {
 
                 /* pour convertir les posdonnées i, j de la grille en x, z du monde */
                 translate(nmv, _cubeSize * j + cX, 0.f, _cubeSize * i + cZ);
-                scale(nmv, _cubeSize / 3.f + (temps *1.5), _cubeSize / 3.f + (temps *1.5), _cubeSize / 3.f + (temps *1.5));
+                double coefExplosion = temps * 1.5;
+                if(temps < 2.8) coefExplosion = 1; // effet soudain
+                scale(nmv, _cubeSize / 3.f + coefExplosion, _cubeSize / 3.f + coefExplosion, _cubeSize / 3.f + coefExplosion);
                 transform_n_rasterize(_sphere, nmv, projection_matrix);
             }
             /* Test voir la position des joueurs dans la grille */
