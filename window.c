@@ -173,11 +173,13 @@ void init(void) {
     int caseA = (_plateauW * _plateauH) - (_plateauW * 2) - 3; // MAX - Wx2 - 3
     _joueurA.x = (caseA / _plateauH) * 1.5;
     _joueurA.z = (caseA / _plateauW) * 1.5;
+    printf("Joueur A => Vert\n");
 
     /* Joueur B */
     int caseB = (_plateauW * 2) + 3; // Wx2 + 3
     _joueurB.x = -(caseB / _plateauH) * 12;
     _joueurB.z = -(caseB / _plateauW) * 12;
+    printf("Joueur B => Bleu\n");
 
     if((_plateau = malloc((_plateauW * _plateauH) * sizeof(int))) == NULL) {
         printf("Impossible d'allouer de la mémoire supplémentaire pour générer le plateau.\n");
@@ -234,23 +236,23 @@ void init(void) {
     int caseJoueurB = round((_joueurB.z + _cubeSize * _plateauH / 2) / _cubeSize) * _plateauH + round((_joueurB.x + _cubeSize * _plateauW / 2) / _cubeSize);
 
     /* Joueur A */
-    _plateau[caseJoueurA] = 2;                // x (facultatif)
+    _plateau[caseJoueurA] = 2;                 // x (facultatif)
     _plateau[caseJoueurA - _plateauW - 1] = 0; // A
     _plateau[caseJoueurA - _plateauW] = 0;     // B
     _plateau[caseJoueurA - _plateauW + 1] = 0; // C
-    _plateau[caseJoueurA - 1] = 0;            // D
-    _plateau[caseJoueurA + 1] = 0;            // E
+    _plateau[caseJoueurA - 1] = 0;             // D
+    _plateau[caseJoueurA + 1] = 0;             // E
     _plateau[caseJoueurA + _plateauW - 1] = 0; // F
     _plateau[caseJoueurA + _plateauW] = 0;     // G
     _plateau[caseJoueurA + _plateauW + 1] = 0; // H
 
     /* Joueur B */
-    _plateau[caseJoueurB] = 3;                // x (facultatif)
+    _plateau[caseJoueurB] = 3;                 // x (facultatif)
     _plateau[caseJoueurB - _plateauW - 1] = 0; // A
     _plateau[caseJoueurB - _plateauW] = 0;     // B
     _plateau[caseJoueurB - _plateauW + 1] = 0; // C
-    _plateau[caseJoueurB - 1] = 0;            // D
-    _plateau[caseJoueurB + 1] = 0;            // E
+    _plateau[caseJoueurB - 1] = 0;             // D
+    _plateau[caseJoueurB + 1] = 0;             // E
     _plateau[caseJoueurB + _plateauW - 1] = 0; // F
     _plateau[caseJoueurB + _plateauW] = 0;     // G
     _plateau[caseJoueurB + _plateauW + 1] = 0; // H
@@ -277,7 +279,7 @@ void idle(void) {
     float decalageDH = 1.f - decalageAutorisee; // décalage pour la droite et le haut */
 
     /* Mouvements du Joueur A */
-    /* Coordonées x, z */
+    /* Coordonées x, z du joueur A*/
     float zA = (_joueurA.z + _cubeSize * _plateauH / 2) / _cubeSize; // ligne   - hauteur
     float xA = (_joueurA.x + _cubeSize * _plateauW / 2) / _cubeSize; // colonne - longueur
 
@@ -287,6 +289,17 @@ void idle(void) {
     int posHautA   = floor(zA) * _plateauH + round(xA);
     int posGaucheA = round(zA) * _plateauH + floor(xA);
     int posBasA    = ceil(zA)  * _plateauH + round(xA);
+
+    /* Coordonées x, z du joueur B*/
+    float zB = (float)((_joueurB.z + _cubeSize * _plateauH / 2) / _cubeSize); // ligne - hauteur
+    float xB = (float)((_joueurB.x + _cubeSize * _plateauW / 2) / _cubeSize); // colonne - longueur
+
+    /* Coordonnées joueur B */
+    int posJoueurB = round(zB) * _plateauH + round(xB);
+    int posDroiteB = round(zB) * _plateauH + ceil(xB);
+    int posHautB   = floor(zB) * _plateauH + round(xB);
+    int posGaucheB = round(zB) * _plateauH + floor(xB);
+    int posBasB    = ceil(zB)  * _plateauH + round(xB);
 
     /* Décalage pour éviter bug de collisions */
     /* float decalageLargeurA  = zA - floor(zA);
@@ -331,34 +344,46 @@ void idle(void) {
     }
 
     if((int)(t - (_joueurA.bombe - 1)) / 1000 >= 3 && _joueurA.bombe != 0) { // quand la bombe doit explosé
+        int trouveA = 0;
+        int trouveB = 0;
         for(int i = 0; i <= 2; i++) { // on supprime les caisses aux alentours
             /* Vérification mort d'un joueur */
             int mort = 0;
-            if(_plateau[_joueurA.bombePos - _plateauW - i] == 2 || _plateau[_joueurA.bombePos - _plateauW - i] == 3) _plateau[_joueurA.bombePos - _plateauW - i] = 0;
-            if(_plateau[_joueurA.bombePos - _plateauW + i] == 2 || _plateau[_joueurA.bombePos - _plateauW + i] == 3) _plateau[_joueurA.bombePos - _plateauW + i] = 0;
-            if(_plateau[_joueurA.bombePos - i] == 2             || _plateau[_joueurA.bombePos - i] == 3)             _plateau[_joueurA.bombePos - i] = 0;
-            if(_plateau[_joueurA.bombePos + i] == 2             || _plateau[_joueurA.bombePos + i] == 3)             _plateau[_joueurA.bombePos + i] = 0;
-            if(_plateau[_joueurA.bombePos + _plateauW - i] == 2 || _plateau[_joueurA.bombePos + _plateauW - i] == 3) _plateau[_joueurA.bombePos + _plateauW - i] = 0;
-            if(_plateau[_joueurA.bombePos + _plateauW + i] == 2 || _plateau[_joueurA.bombePos + _plateauW + i] == 3) _plateau[_joueurA.bombePos + _plateauW + i] = 0;
+            if(_joueurA.bombePos == posJoueurA) trouveA = 1;
+            if(_joueurB.bombePos == posJoueurB) trouveB = 1;
+
+            if(_plateau[_joueurA.bombePos - _plateauW - i] == 2) trouveA = 1;
+            if(_plateau[_joueurA.bombePos - _plateauW - i] == 3) trouveB = 1;
+
+            if(_plateau[_joueurA.bombePos - _plateauW + i] == 2) trouveA = 1;
+            if(_plateau[_joueurA.bombePos - _plateauW + i] == 3) trouveB = 1;
+
+            if(_plateau[_joueurA.bombePos - i] == 2)             trouveA = 1;
+            if(_plateau[_joueurA.bombePos - i] == 3)             trouveB = 1;
+
+            if(_plateau[_joueurA.bombePos + i] == 2)             trouveA = 1;
+            if(_plateau[_joueurA.bombePos + i] == 3)             trouveB = 1;
+
+            if(_plateau[_joueurA.bombePos + _plateauW - i] == 2) trouveA = 1;
+            if(_plateau[_joueurA.bombePos + _plateauW - i] == 3) trouveB = 1;
+
+            if(_plateau[_joueurA.bombePos + _plateauW + i] == 2) trouveA = 1;
+            if(_plateau[_joueurA.bombePos + _plateauW + i] == 3) trouveB = 1;
+
+            if(trouveA || trouveB) printf("cc\n");
 
             /* On vérifie que les 2 joueurs sont bien dans la map,
              * s'il en manque un c'est qu'il est probablement
              * à la position de la bombe */
-            int trouveA = 0;
-            int trouveB = 0;
-            for(int j = _plateauW; j < _plateauH * _plateauW; j++) {
-                if(_plateau[j] == 2) trouveA = 1;
-                if(_plateau[j] == 3) trouveB = 1;
-            }
-            if(trouveA == 0) mort = 2;
-            if(trouveB == 0) mort = 3;
-            if(trouveA == 0 && trouveB == 0) mort = 4;
+            if(trouveA) mort = 1;
+            if(trouveB) mort = 2;
+            if(trouveA && trouveB) mort = 3;
 
-            if(mort != 0) {
-                char joueur = 'B';
-                if(mort == 2) joueur = 'A';
-                if(mort == 4) printf("TERMINÉ ! TOUT LE MONDE A PERDU !\n");
-                else printf("TERMINÉ ! JOUEUR %c A PERDU !\n", joueur);
+            if(mort != 0 && i == 2) { // on fait le compta des morts seulement lors de la dernière boucle
+                char joueur = 'A';
+                if(mort) joueur = 'B';
+                if(mort == 3) printf("TERMINÉ ! TOUT LE MONDE À PERDU !\n");
+                else printf("TERMINÉ ! JOUEUR %c À GAGNÉ !\n", joueur);
                 sortie();
                 exit(0);
             }
@@ -393,16 +418,6 @@ void idle(void) {
 
 
     /* Mouvements du Joueur B */
-    /* Coordonées x, z */
-    float zB = (float)((_joueurB.z + _cubeSize * _plateauH / 2) / _cubeSize); // ligne - hauteur
-    float xB = (float)((_joueurB.x + _cubeSize * _plateauW / 2) / _cubeSize); // colonne - longueur
-
-    /* Coordonnées joueur A */
-    int posJoueurB = round(zB) * _plateauH + round(xB);
-    int posDroiteB = round(zB) * _plateauH + ceil(xB);
-    int posHautB   = floor(zB) * _plateauH + round(xB);
-    int posGaucheB = round(zB) * _plateauH + floor(xB);
-    int posBasB    = ceil(zB)  * _plateauH + round(xB);
 
     /* Décalage pour éviter bug de collisions */
     /* float decalageLargeurB  = zB - floor(zB);
@@ -440,34 +455,44 @@ void idle(void) {
     }
 
     if((int)(t - (_joueurB.bombe - 1)) / 1000 >= 3 && _joueurB.bombe != 0) { // quand la bombe doit explosé
+        int trouveA = 0;
+        int trouveB = 0;
         for(int i = 0; i <= 2; i++) { // on supprime les caisses aux alentours
             /* Vérification mort d'un joueur */
             int mort = 0;
-            if(_plateau[_joueurB.bombePos - _plateauW - i] == 2 || _plateau[_joueurB.bombePos - _plateauW - i] == 3) _plateau[_joueurB.bombePos - _plateauW - i] = 0;
-            if(_plateau[_joueurB.bombePos - _plateauW + i] == 2 || _plateau[_joueurB.bombePos - _plateauW + i] == 3) _plateau[_joueurB.bombePos - _plateauW + i] = 0;
-            if(_plateau[_joueurB.bombePos - i] == 2             || _plateau[_joueurB.bombePos - i] == 3)             _plateau[_joueurB.bombePos - i] = 0;
-            if(_plateau[_joueurB.bombePos + i] == 2             || _plateau[_joueurB.bombePos + i] == 3)             _plateau[_joueurB.bombePos + i] = 0;
-            if(_plateau[_joueurB.bombePos + _plateauW - i] == 2 || _plateau[_joueurB.bombePos + _plateauW - i] == 3) _plateau[_joueurB.bombePos + _plateauW - i] = 0;
-            if(_plateau[_joueurB.bombePos + _plateauW + i] == 2 || _plateau[_joueurB.bombePos + _plateauW + i] == 3) _plateau[_joueurB.bombePos + _plateauW + i] = 0;
+            if(_joueurB.bombePos == posJoueurA) trouveA = 1;
+            if(_joueurB.bombePos == posJoueurB) trouveB = 1;
+
+            if(_plateau[_joueurB.bombePos - _plateauW - i] == 2) trouveA = 1;
+            if(_plateau[_joueurB.bombePos - _plateauW - i] == 3) trouveB = 1;
+
+            if(_plateau[_joueurB.bombePos - _plateauW + i] == 2) trouveA = 1;
+            if(_plateau[_joueurB.bombePos - _plateauW + i] == 3) trouveB = 1;
+
+            if(_plateau[_joueurB.bombePos - i] == 2)             trouveA = 1;
+            if(_plateau[_joueurB.bombePos - i] == 3)             trouveB = 1;
+
+            if(_plateau[_joueurB.bombePos + i] == 2)             trouveA = 1;
+            if(_plateau[_joueurB.bombePos + i] == 3)             trouveB = 1;
+
+            if(_plateau[_joueurB.bombePos + _plateauW - i] == 2) trouveA = 1;
+            if(_plateau[_joueurB.bombePos + _plateauW - i] == 3) trouveB = 1;
+
+            if(_plateau[_joueurB.bombePos + _plateauW + i] == 2) trouveA = 1;
+            if(_plateau[_joueurB.bombePos + _plateauW + i] == 3) trouveB = 1;
 
             /* On vérifie que les 2 joueurs sont bien dans la map,
              * s'il en manque un c'est qu'il est probablement
              * à la position de la bombe */
-            int trouveA = 0;
-            int trouveB = 0;
-            for(int j = _plateauW; j < _plateauH * _plateauW; j++) {
-                if(_plateau[j] == 2) trouveA = 1;
-                if(_plateau[j] == 3) trouveB = 1;
-            }
-            if(trouveA == 0) mort = 2;
-            if(trouveB == 0) mort = 3;
-            if(trouveA == 0 && trouveB == 0) mort = 4;
+            if(trouveA) mort = 1;
+            if(trouveB) mort = 2;
+            if(trouveA && trouveB) mort = 3;
 
-            if(mort != 0) {
-                char joueur = 'B';
-                if(mort == 2) joueur = 'A';
-                if(mort == 4) printf("TERMINÉ ! TOUT LE MONDE A PERDU !\n");
-                else printf("TERMINÉ ! JOUEUR %c A PERDU !\n", joueur);
+            if(mort != 0 && i == 2) { // on fait le compta des morts seulement lors de la dernière boucle
+                char joueur = 'A';
+                if(mort) joueur = 'B';
+                if(mort == 3) printf("TERMINÉ ! TOUT LE MONDE À PERDU !\n");
+                else printf("TERMINÉ ! JOUEUR %c À GAGNÉ !\n", joueur);
                 sortie();
                 exit(0);
             }
