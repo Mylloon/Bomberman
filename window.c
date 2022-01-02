@@ -315,22 +315,22 @@ void idle(void) {
      * On part de la posdonnées de droite car posDroite = E. */
     if(_vkeyboard[VK_RIGHT])
         /* Collision à droite du joueur */
-        if(_plateau[posDroiteA] == 0 || _plateau[posDroiteA] == 2 || _plateau[posDroiteA] == 6 || _plateau[posDroiteA] == 7) // si case vide ou joueur ou bombe
+        if(_plateau[posDroiteA] == 0 || _plateau[posDroiteA] == 2 || _plateau[posDroiteA] == 6) // si case vide ou joueur ou bombe
             /* if(decalageLargeurA < decalageGB || decalageLargeurA > decalageDH) */ _joueurA.x += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_UP])
         /* Collision en haut du joueur */
-        if(_plateau[posHautA] == 0 || _plateau[posHautA] == 2 || _plateau[posHautA] == 6 || _plateau[posHautA] == 7) // si case vide ou joueur ou bombe
+        if(_plateau[posHautA] == 0 || _plateau[posHautA] == 2 || _plateau[posHautA] == 6 ) // si case vide ou joueur ou bombe
             /* if(decalageLongueurA < decalageGB || decalageLongueurA > decalageDH) */ _joueurA.z -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_LEFT])
         /* Collision à gauche du joueur */
-        if(_plateau[posGaucheA] == 0 || _plateau[posGaucheA] == 2 || _plateau[posGaucheA] == 6 || _plateau[posGaucheA] == 7) // si case vide ou joueur ou bombe
+        if(_plateau[posGaucheA] == 0 || _plateau[posGaucheA] == 2 || _plateau[posGaucheA] == 6) // si case vide ou joueur ou bombe
             /* if(decalageLargeurA < decalageGB || decalageLargeurA > decalageDH) */ _joueurA.x -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_DOWN])
         /* Collision en bas du joueur */
-        if(_plateau[posBasA] == 0 || _plateau[posBasA] == 2 || _plateau[posBasA] == 6 || _plateau[posBasA] == 7) // si case vide ou joueur ou bombe
+        if(_plateau[posBasA] == 0 || _plateau[posBasA] == 2 || _plateau[posBasA] == 6) // si case vide ou joueur ou bombe
             /* if(decalageLongueurA < decalageGB || decalageLongueurA > decalageDH) */ _joueurA.z += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_RETURN]) {
@@ -431,22 +431,22 @@ void idle(void) {
     /* Déplacement */
     if(_vkeyboard[VK_d])
         /* Collision à droite du joueur */
-        if(_plateau[posDroiteB] == 0 || _plateau[posDroiteB] == 3 || _plateau[posDroiteB] == 6 || _plateau[posDroiteB] == 7) // si case vide ou joueur ou bombe
+        if(_plateau[posDroiteB] == 0 || _plateau[posDroiteB] == 3 || _plateau[posDroiteB] == 7) // si case vide ou joueur ou bombe
             /* if(decalageLargeurB < decalageGB || decalageLargeurB > decalageDH) */ _joueurB.x += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_z])
         /* Collision en haut du joueur */
-        if(_plateau[posHautB] == 0 || _plateau[posHautB] == 3 || _plateau[posHautB] == 6 || _plateau[posHautB] == 7) // si case vide ou joueur ou bombe
+        if(_plateau[posHautB] == 0 || _plateau[posHautB] == 3 || _plateau[posHautB] == 7) // si case vide ou joueur ou bombe
             /* if(decalageLongueurB < decalageGB || decalageLongueurB > decalageDH) */ _joueurB.z -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_q])
         /* Collision à gauche du joueur */
-        if(_plateau[posGaucheB] == 0 || _plateau[posGaucheB] == 3 || _plateau[posGaucheB] == 6 || _plateau[posGaucheB] == 7) // si case vide ou joueur ou bombe
+        if(_plateau[posGaucheB] == 0 || _plateau[posGaucheB] == 3 || _plateau[posGaucheB] == 7) // si case vide ou joueur ou bombe
             /* if(decalageLargeurB < decalageGB || decalageLargeurB > decalageDH) */ _joueurB.x -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_s])
         /* Collision en bas du joueur */
-        if(_plateau[posBasB] == 0 || _plateau[posBasB] == 3 || _plateau[posBasB] == 6 || _plateau[posBasB] == 7) // si case vide ou joueur ou bombe
+        if(_plateau[posBasB] == 0 || _plateau[posBasB] == 3 || _plateau[posBasB] == 7) // si case vide ou joueur ou bombe
                 /* if(decalageLongueurB < decalageGB || decalageLongueurB > decalageDH) */ _joueurB.z += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_SPACE]) {
