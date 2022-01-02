@@ -46,7 +46,9 @@ static int _debug = 0;
  * 1 -> Mur
  * 2 (valeur reservée) -> Joueur A (défini automatiquement par le programme)
  * 3 (valeur reservée) -> Joueur B (défini automatiquement par le programme)
- * 4 -> Bloc destructible */
+ * 4 -> Bloc destructible
+ * 5 -> Mur extérieur
+ * 6 (valeur reservée) -> Bombe (défini automatiquement par le programme) */
 static int * _plateau = NULL;
 
 /*!\brief Largeur/Nombre de lignes de la grille */
@@ -184,19 +186,19 @@ void init(void) {
         for(int j = 0; j < _grilleW; j++) {
             int _case = i * _grilleH + j;
             if(i == 0) { // mur en haut
-                _plateau[_case] = 1;
+                _plateau[_case] = 5;
                 continue;
             }
             if(i == (_grilleH - 1)) { // mur en bas
-                _plateau[_case] = 1;
+                _plateau[_case] = 5;
                 continue;
             }
             if(j == 0) { // mur a gauche
-                _plateau[_case] = 1;
+                _plateau[_case] = 5;
                 continue;
             }
             if(j == (_grilleW - 1)) { // mur a droite
-                _plateau[_case] = 1;
+                _plateau[_case] = 5;
                 continue;
             }
             if((j % 2) == 0 && (i % 2) == 0) { // mur à l'intérieur
@@ -276,11 +278,11 @@ void idle(void) {
     float xA = (_joueurA.x + _cubeSize * _grilleW / 2) / _cubeSize; // colonne - longueur
 
     /* Coordonnées joueur A */
-    int coorJoueurA = round(zA) * _grilleH + round(xA);
-    int coorDroiteA = round(zA) * _grilleH + ceil(xA);
-    int coorHautA   = floor(zA) * _grilleH + round(xA);
-    int coorGaucheA = round(zA) * _grilleH + floor(xA);
-    int coorBasA    = ceil(zA)  * _grilleH + round(xA);
+    int posJoueurA = round(zA) * _grilleH + round(xA);
+    int posDroiteA = round(zA) * _grilleH + ceil(xA);
+    int posHautA   = floor(zA) * _grilleH + round(xA);
+    int posGaucheA = round(zA) * _grilleH + floor(xA);
+    int posBasA    = ceil(zA)  * _grilleH + round(xA);
 
     /* Décalage pour éviter bug de collisions */
     /* float decalageLargeurA  = zA - floor(zA);
@@ -293,30 +295,31 @@ void idle(void) {
      * D x E
      * F G H
      * Pour aller à droite on regarde si C et H ne sont pas des murs
-     * On part de la coordonnées de droite car coorDroite = E. */
+     * On part de la posdonnées de droite car posDroite = E. */
     if(_vkeyboard[VK_RIGHT])
         /* Collision à droite du joueur */
-        if(_plateau[coorDroiteA] == 0 || _plateau[coorDroiteA] == 2) // si case vide ou joueur
+        if(_plateau[posDroiteA] == 0 || _plateau[posDroiteA] == 2 || _plateau[posDroiteA] == 6) // si case vide ou joueur ou bombe
             /* if(decalageLargeurA < decalageGB || decalageLargeurA > decalageDH) */ _joueurA.x += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_UP])
         /* Collision en haut du joueur */
-        if(_plateau[coorHautA] == 0 || _plateau[coorHautA] == 2) // si case vide ou joueur
+        if(_plateau[posHautA] == 0 || _plateau[posHautA] == 2 || _plateau[posHautA] == 6) // si case vide ou joueur ou bombe
             /* if(decalageLongueurA < decalageGB || decalageLongueurA > decalageDH) */ _joueurA.z -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_LEFT])
         /* Collision à gauche du joueur */
-        if(_plateau[coorGaucheA] == 0 || _plateau[coorGaucheA] == 2) // si case vide ou joueur
+        if(_plateau[posGaucheA] == 0 || _plateau[posGaucheA] == 2 || _plateau[posGaucheA] == 6) // si case vide ou joueur ou bombe
             /* if(decalageLargeurA < decalageGB || decalageLargeurA > decalageDH) */ _joueurA.x -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_DOWN])
         /* Collision en bas du joueur */
-        if(_plateau[coorBasA] == 0 || _plateau[coorBasA] == 2) // si case vide ou joueur
+        if(_plateau[posBasA] == 0 || _plateau[posBasA] == 2 || _plateau[posBasA] == 6) // si case vide ou joueur ou bombe
             /* if(decalageLongueurA < decalageGB || decalageLongueurA > decalageDH) */ _joueurA.z += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_RETURN]) {
         _vkeyboard[VK_RETURN] = 0; // on évite de spam la pose de bombe
         printf("Joueur A pose une bombe!\n"); // temp
+        _plateau[posJoueurA] = 6;
     }
 
     /* Affichage Debug */
@@ -324,15 +327,15 @@ void idle(void) {
         printf("\n========== Joueur A ==========\n");
         printf(" li = %d, col = %d, idx = %d\n", (int)(zA + .5f), (int)(xA + .5f), _joueurA.position);
         printf(" zA=%f xA=%f\n", zA, xA);
-        printf(" d=%d h=%d g=%d b=%d\n", coorDroiteA, coorHautA, coorGaucheA, coorBasA);
+        printf(" d=%d h=%d g=%d b=%d\n", posDroiteA, posHautA, posGaucheA, posBasA);
     }
 
     /* Anti-collision entre joueurs */
-    if(_joueurA.position != coorJoueurA) {
+    if(_joueurA.position != posJoueurA && _plateau[posJoueurA] != 6 && _plateau[_joueurA.position] != 6) {
         if(_joueurA.position != -1)
             _plateau[_joueurA.position] = 0;
-        _joueurA.position = coorJoueurA;
-        _plateau[coorJoueurA] = 2;
+        _joueurA.position = posJoueurA;
+        _plateau[posJoueurA] = 2;
     }
 
 
@@ -342,11 +345,11 @@ void idle(void) {
     float xB = (float)((_joueurB.x + _cubeSize * _grilleW / 2) / _cubeSize); // colonne - longueur
 
     /* Coordonnées joueur A */
-    int coorJoueurB = round(zB) * _grilleH + round(xB);
-    int coorDroiteB = round(zB) * _grilleH + ceil(xB);
-    int coorHautB   = floor(zB) * _grilleH + round(xB);
-    int coorGaucheB = round(zB) * _grilleH + floor(xB);
-    int coorBasB    = ceil(zB)  * _grilleH + round(xB);
+    int posJoueurB = round(zB) * _grilleH + round(xB);
+    int posDroiteB = round(zB) * _grilleH + ceil(xB);
+    int posHautB   = floor(zB) * _grilleH + round(xB);
+    int posGaucheB = round(zB) * _grilleH + floor(xB);
+    int posBasB    = ceil(zB)  * _grilleH + round(xB);
 
     /* Décalage pour éviter bug de collisions */
     /* float decalageLargeurB  = zB - floor(zB);
@@ -355,27 +358,28 @@ void idle(void) {
     /* Déplacement */
     if(_vkeyboard[VK_d])
         /* Collision à droite du joueur */
-        if(_plateau[coorDroiteB] == 0 || _plateau[coorDroiteB] == 3) // si case vide ou joueur
+        if(_plateau[posDroiteB] == 0 || _plateau[posDroiteB] == 3 || _plateau[posDroiteB] == 6) // si case vide ou joueur ou bombe
             /* if(decalageLargeurB < decalageGB || decalageLargeurB > decalageDH) */ _joueurB.x += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_z])
         /* Collision en haut du joueur */
-        if(_plateau[coorHautB] == 0 || _plateau[coorHautB] == 3) // si case vide ou joueur
+        if(_plateau[posHautB] == 0 || _plateau[posHautB] == 3 || _plateau[posHautB] == 6) // si case vide ou joueur ou bombe
             /* if(decalageLongueurB < decalageGB || decalageLongueurB > decalageDH) */ _joueurB.z -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_q])
         /* Collision à gauche du joueur */
-        if(_plateau[coorGaucheB] == 0 || _plateau[coorGaucheB] == 3) // si case vide ou joueur
+        if(_plateau[posGaucheB] == 0 || _plateau[posGaucheB] == 3 || _plateau[posGaucheB] == 6) // si case vide ou joueur ou bombe
             /* if(decalageLargeurB < decalageGB || decalageLargeurB > decalageDH) */ _joueurB.x -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_s])
         /* Collision en bas du joueur */
-        if(_plateau[coorBasB] == 0 || _plateau[coorBasB] == 3) // si case vide ou joueur
+        if(_plateau[posBasB] == 0 || _plateau[posBasB] == 3 || _plateau[posBasB] == 6) // si case vide ou joueur ou bombe
                 /* if(decalageLongueurB < decalageGB || decalageLongueurB > decalageDH) */ _joueurB.z += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_SPACE]) {
         _vkeyboard[VK_SPACE] = 0; // on évite de spam la pose de bombe
         printf("Joueur B pose une bombe!\n"); // temp
+        _plateau[posJoueurB] = 6;
     }
 
     /* Affichage Debug */
@@ -383,25 +387,27 @@ void idle(void) {
         printf("========== Joueur B ==========\n");
         printf(" li = %d, col = %d, idx = %d\n", (int)(zB + .5f), (int)(xB + .5f), _joueurB.position);
         printf(" zB=%f xB=%f\n", zB, xB);
-        printf(" d=%d h=%d g=%d b=%d\n", coorDroiteB, coorHautB, coorGaucheB, coorBasB);
+        printf(" d=%d h=%d g=%d b=%d\n", posDroiteB, posHautB, posGaucheB, posBasB);
         printf("===============================\n");
     }
 
     /* Anti-collision entre joueurs */
-    if(_joueurB.position != coorJoueurB) {
+    if(_joueurB.position != posJoueurB && _plateau[posJoueurB] != 6 && _plateau[_joueurB.position] != 6) {
         if(_joueurB.position != -1)
             _plateau[_joueurB.position] = 0;
-        _joueurB.position = coorJoueurB;
-        _plateau[coorJoueurB] = 3;
+        _joueurB.position = posJoueurB;
+        _plateau[posJoueurB] = 3;
     }
 }
 
 /*!\brief Fonction appelée à chaque display. */
 void draw(void) {
-    vec4 couleurPlateau = {0.2, 0.2, 0.2, 1},   /* Gris */
-         couleurJoueurA = {0.15, 0.5, 0.15, 1}, /* Vert */
-         couleurJoueurB = {0.2, 0.2, 0.7, 1},   /* Bleu */
-         couleurBois    = {0.6, 0.3, 0, 1};     /* Marron */
+    vec4 couleurMur          = {0.2,  0.2,  0.2, 1},   /* Gris */
+         couleurJoueurA      = {0.15, 0.5, 0.15, 1}, /* Vert */
+         couleurJoueurB      = {0.2,  0.2,  0.7, 1},   /* Bleu */
+         couleurMurExterieur = {0.1,  0.1,  0.1, 1},   /* Gris foncé */
+         couleurBois         = {0.6,  0.3,    0, 1},     /* Marron */
+         couleurBombe        = {1.,     0,    0, 1};         /* Rouge */
 
     float model_view_matrix[16], projection_matrix[16], nmv[16];
 
@@ -430,13 +436,24 @@ void draw(void) {
         for(int j = 0; j < _grilleH; ++j) {
             /* Bloc simple */
             if(_plateau[i * _grilleW + j] == 1) {
-                _cube->dcolor = couleurPlateau;
+                _cube->dcolor = couleurMur;
                 /* copie model_view_matrix dans nmv */
                 memcpy(nmv, model_view_matrix, sizeof(nmv));
 
-                /* pour convertir les coordonnées i, j de la grille en x, z du monde */
-                translate(nmv, _cubeSize * j + cX, 0.0f, _cubeSize * i + cZ);
-                scale(nmv, _cubeSize / 2.0f, _cubeSize / 2.0f, _cubeSize / 2.0f);
+                /* pour convertir les posdonnées i, j de la grille en x, z du monde */
+                translate(nmv, _cubeSize * j + cX, 0.f, _cubeSize * i + cZ);
+                scale(nmv, _cubeSize / 2.f, _cubeSize / 2.f, _cubeSize / 2.f);
+                transform_n_rasterize(_cube, nmv, projection_matrix);
+            }
+            /* Mur exterieur */
+            if(_plateau[i * _grilleW + j] == 5) {
+                _cube->dcolor = couleurMurExterieur;
+                /* copie model_view_matrix dans nmv */
+                memcpy(nmv, model_view_matrix, sizeof(nmv));
+
+                /* pour convertir les posdonnées i, j de la grille en x, z du monde */
+                translate(nmv, _cubeSize * j + cX, 0.f, _cubeSize * i + cZ);
+                scale(nmv, _cubeSize / 2.f, _cubeSize / 2.f, _cubeSize / 2.f);
                 transform_n_rasterize(_cube, nmv, projection_matrix);
             }
             /* Bloc destructible */
@@ -445,11 +462,32 @@ void draw(void) {
                 /* copie model_view_matrix dans nmv */
                 memcpy(nmv, model_view_matrix, sizeof(nmv));
 
-                /* pour convertir les coordonnées i, j de la grille en x, z du monde */
-                translate(nmv, _cubeSize * j + cX, 0.0f, _cubeSize * i + cZ);
+                /* pour convertir les posdonnées i, j de la grille en x, z du monde */
+                translate(nmv, _cubeSize * j + cX, 0.f, _cubeSize * i + cZ);
                 scale(nmv, _cubeSize / 2.6f, _cubeSize / 2.6f, _cubeSize / 2.6f);
                 transform_n_rasterize(_cubeBois, nmv, projection_matrix);
             }
+            /* Bombe */
+            if(_plateau[i * _grilleW + j] == 6) {
+                _sphere->dcolor = couleurBombe;
+                /* copie model_view_matrix dans nmv */
+                memcpy(nmv, model_view_matrix, sizeof(nmv));
+
+                /* pour convertir les posdonnées i, j de la grille en x, z du monde */
+                translate(nmv, _cubeSize * j + cX, 0.f, _cubeSize * i + cZ);
+                scale(nmv, _cubeSize / 3.f, _cubeSize / 3.f, _cubeSize / 3.f);
+                transform_n_rasterize(_sphere, nmv, projection_matrix);
+            }
+            /* Test voir la position des joueurs dans la grille */
+            /* if(_plateau[i * _grilleW + j] == 2 || _plateau[i * _grilleW + j] == 3) {
+                vec4 blanc = {1, 1, 1, 1};
+                _sphere->dcolor = blanc;
+                memcpy(nmv, model_view_matrix, sizeof(nmv));
+
+                translate(nmv, _cubeSize * j + cX, 0.f, _cubeSize * i + cZ);
+                scale(nmv, _cubeSize / 3.f, _cubeSize / 3.f, _cubeSize / 3.f);
+                transform_n_rasterize(_sphere, nmv, projection_matrix);
+            } */
         }
 
     /* Dessine le Joueur A */
@@ -458,10 +496,10 @@ void draw(void) {
     memcpy(nmv, model_view_matrix, sizeof(nmv));
     /* Corps */
     translate(nmv, _joueurA.x, _joueurA.y, _joueurA.z);
-    scale(nmv, _cubeSize / 3.0f, _cubeSize / 3.0f, _cubeSize / 3.0f);
+    scale(nmv, _cubeSize / 3.f, _cubeSize / 3.f, _cubeSize / 3.f);
     transform_n_rasterize(_cube, nmv, projection_matrix);
     /* Tête */
-    translate(nmv, 0.0f, 2.0f, 0.0f);
+    translate(nmv, 0.f, 2.f, 0.f);
     transform_n_rasterize(_sphere, nmv, projection_matrix);
 
     /* Dessine le Joueur B */
@@ -470,10 +508,10 @@ void draw(void) {
     memcpy(nmv, model_view_matrix, sizeof(nmv));
     /* Corps */
     translate(nmv, _joueurB.x, _joueurB.y, _joueurB.z);
-    scale(nmv, _cubeSize / 3.0f, _cubeSize / 3.0f, _cubeSize / 3.0f);
+    scale(nmv, _cubeSize / 3.f, _cubeSize / 3.f, _cubeSize / 3.f);
     transform_n_rasterize(_cube, nmv, projection_matrix);
     /* Tête */
-    translate(nmv, 0.0f, 2.0f, 0.0f);
+    translate(nmv, 0.f, 2.f, 0.f);
     transform_n_rasterize(_sphere, nmv, projection_matrix);
 
     /* Déclare que l'on a changé des pixels de l'écran (bas niveau) */
