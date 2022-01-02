@@ -146,7 +146,7 @@ void init(void) {
 
     /* TODO
      * Génération pour _grilleH aléatoire aussi
-     * Corriger la position des joueurs en fonction de la map pour pas spawn dans un mur
+     * Éloigner les spawns des joueurs
      * Zoom de la caméra en fonction de la taille de la map */
 
     _grilleW = 10 + (rand() % 10);
@@ -161,27 +161,27 @@ void init(void) {
     int _curseur = 0;
     for(int i = 0; i < _grilleH; i++)
         for(int j = 0; j < _grilleW; j++) {
-            if (i == 0) {
+            if (i == 0) { // mur en haut
                 _grille[_curseur] = 1;
                 _curseur++;
                 continue;
             }
-            if (i == (_grilleH - 1)) {
+            if (i == (_grilleH - 1)) { // mur en bas
                 _grille[_curseur] = 1;
                 _curseur++;
                 continue;
             }
-            if (j == 0) {
+            if (j == 0) { // mur a gauche
                 _grille[_curseur] = 1;
                 _curseur++;
                 continue;
             }
-            if (j == (_grilleW - 1)) {
+            if (j == (_grilleW - 1)) { // mur a droite
                 _grille[_curseur] = 1;
                 _curseur++;
                 continue;
             }
-            if ((j % 2) == 0 && (i % 2) == 0) {
+            if ((j % 2) == 0 && (i % 2) == 0) { // mur à l'intérieur
                 _grille[_curseur] = 1;
                 _curseur++;
                 continue;
@@ -189,6 +189,31 @@ void init(void) {
             _grille[_curseur] = 0;
             _curseur++;
         }
+
+
+    /* On s'assure que au moins une cases autours du joueurs sont libre
+     * ça donne ça :
+     * 0 0 0
+     * 0 x 0
+     * 0 0 0 */
+
+    // Coordonnées joueurs
+    int caseJoueurA = round((_herosA.z + _cubeSize * _grilleH / 2) / _cubeSize) * _grilleH + round((_herosA.x + _cubeSize * _grilleW / 2) / _cubeSize);
+    int caseJoueurB = round((_herosB.z + _cubeSize * _grilleH / 2) / _cubeSize) * _grilleH + round((_herosB.x + _cubeSize * _grilleW / 2) / _cubeSize);
+
+    for (int i = 1; i <= 2; i++) { // attention au bordures
+        /* Joueur A */
+        _grille[caseJoueurA - i] = 0; // gauche
+        _grille[caseJoueurA + i] = 0; // droite
+        _grille[caseJoueurA - _grilleW - i] = 0; // haut
+        _grille[caseJoueurA + _grilleW + i] = 0; // bas
+
+        /* Joueur B */
+        _grille[caseJoueurB - i] = 0; // gauche
+        _grille[caseJoueurB + i] = 0; // droite
+        _grille[caseJoueurB - _grilleW - i] = 0; // haut
+        _grille[caseJoueurB + _grilleW + i] = 0; // bas
+    }
 
     /* Mets en place la fonction à appeler en cas de sortie */
     atexit(sortie);
@@ -207,14 +232,14 @@ void idle(void) {
     float vitesse = 10.f; // vitesse des joueurs
 
     /* Calcul du décalage */
-    float decalageAutorisee = .15f; // décalage autorisé, modifier cette valeur si nécessaire
+    float decalageAutorisee = .2f; // décalage autorisé, modifier cette valeur si nécessaire
     float decalageGB = .0f + decalageAutorisee; // décalage pour la gauche et le bas
     float decalageDH = 1.f - decalageAutorisee; // décalage pour la droite et le haut
 
     /* Mouvements du héros A */
     /* Coordonées x, z */
-    float zA = (float)((_herosA.z + _cubeSize * _grilleH / 2) / _cubeSize); // ligne   - hauteur
-    float xA = (float)((_herosA.x + _cubeSize * _grilleW / 2) / _cubeSize); // colonne - longueur
+    float zA = (_herosA.z + _cubeSize * _grilleH / 2) / _cubeSize; // ligne   - hauteur
+    float xA = (_herosA.x + _cubeSize * _grilleW / 2) / _cubeSize; // colonne - longueur
 
     /* Coordonnées joueur A */
     int coorJoueurA = round(zA) * _grilleH + round(xA);
