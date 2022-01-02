@@ -156,7 +156,6 @@ void init(void) {
     _grilleH = _grilleW;
 
     /* Placement des joueurs */
-    // TODO... les faires relativement éloignes l'un de l'autre
     int coefEloignement = _grilleW * 1.05;
 
     /* Joueur A */
@@ -167,7 +166,7 @@ void init(void) {
     _joueurB.x -= coefEloignement;
     _joueurB.z -= coefEloignement;
 
-    if ((_plateau = malloc((_grilleW * _grilleH) * sizeof(int))) == NULL) {
+    if((_plateau = malloc((_grilleW * _grilleH) * sizeof(int))) == NULL) {
         printf("Impossible d'allouer de la mémoire supplémentaire pour générer le plateau.\n");
         sortie();
         exit(1);
@@ -177,23 +176,23 @@ void init(void) {
     for(int i = 0; i < _grilleH; i++)
         for(int j = 0; j < _grilleW; j++) {
             int _case = i * _grilleH + j;
-            if (i == 0) { // mur en haut
+            if(i == 0) { // mur en haut
                 _plateau[_case] = 1;
                 continue;
             }
-            if (i == (_grilleH - 1)) { // mur en bas
+            if(i == (_grilleH - 1)) { // mur en bas
                 _plateau[_case] = 1;
                 continue;
             }
-            if (j == 0) { // mur a gauche
+            if(j == 0) { // mur a gauche
                 _plateau[_case] = 1;
                 continue;
             }
-            if (j == (_grilleW - 1)) { // mur a droite
+            if(j == (_grilleW - 1)) { // mur a droite
                 _plateau[_case] = 1;
                 continue;
             }
-            if ((j % 2) == 0 && (i % 2) == 0) { // mur à l'intérieur
+            if((j % 2) == 0 && (i % 2) == 0) { // mur à l'intérieur
                 _plateau[_case] = 1;
                 continue;
             }
@@ -215,25 +214,33 @@ void init(void) {
      * D x E
      * F G H
      * avec A B C D E F G H des positions
-     * et x le joueur */
-
+     * et x le joueur Attention au bordures !
+     * On les fait spawn loin des bordures
+     * pour éviter tout problèmes. */
     int caseJoueurA = round((_joueurA.z + _cubeSize * _grilleH / 2) / _cubeSize) * _grilleH + round((_joueurA.x + _cubeSize * _grilleW / 2) / _cubeSize);
     int caseJoueurB = round((_joueurB.z + _cubeSize * _grilleH / 2) / _cubeSize) * _grilleH + round((_joueurB.x + _cubeSize * _grilleW / 2) / _cubeSize);
-    for(int i = 0; i <= 2; i++) { /* Attention au bordures !
-                                   * On les fait spawn loin des bordures
-                                   * pour éviter tout problèmes. */
-        /* Joueur A */
-        _plateau[caseJoueurA - i] = 0; // D
-        _plateau[caseJoueurA + i] = 0; // E
-        _plateau[caseJoueurA - _grilleW - i] = 0; // B
-        _plateau[caseJoueurA + _grilleW + i] = 0; // G
 
-        /* Joueur B */
-        _plateau[caseJoueurB - i] = 0; // D
-        _plateau[caseJoueurB + i] = 0; // E
-        _plateau[caseJoueurB - _grilleW - i] = 0; // B
-        _plateau[caseJoueurB + _grilleW + i] = 0; // G
-    }
+    /* Joueur A */
+    _plateau[caseJoueurA] = 2;                // x (facultatif)
+    _plateau[caseJoueurA - _grilleW - 1] = 0; // A
+    _plateau[caseJoueurA - _grilleW] = 0;     // B
+    _plateau[caseJoueurA - _grilleW + 1] = 0; // C
+    _plateau[caseJoueurA - 1] = 0;            // D
+    _plateau[caseJoueurA + 1] = 0;            // E
+    _plateau[caseJoueurA + _grilleW - 1] = 0; // F
+    _plateau[caseJoueurA + _grilleW] = 0;     // G
+    _plateau[caseJoueurA + _grilleW + 1] = 0; // H
+
+    /* Joueur B */
+    _plateau[caseJoueurB] = 3;                // x (facultatif)
+    _plateau[caseJoueurB - _grilleW - 1] = 0; // A
+    _plateau[caseJoueurB - _grilleW] = 0;     // B
+    _plateau[caseJoueurB - _grilleW + 1] = 0; // C
+    _plateau[caseJoueurB - 1] = 0;            // D
+    _plateau[caseJoueurB + 1] = 0;            // E
+    _plateau[caseJoueurB + _grilleW - 1] = 0; // F
+    _plateau[caseJoueurB + _grilleW] = 0;     // G
+    _plateau[caseJoueurB + _grilleW + 1] = 0; // H
 
     /* Mets en place la fonction à appeler en cas de sortie */
     atexit(sortie);
@@ -356,7 +363,7 @@ void draw(void) {
     vec4 couleurPlateau = {0.2, 0.2, 0.2, 1},   /* Gris */
          couleurJoueurA = {0.15, 0.5, 0.15, 1}, /* Vert */
          couleurJoueurB = {0.2, 0.2, 0.7, 1},   /* Bleu */
-         couleurBois    = {0.6, 0.3, 0, 0};     /* Marron */
+         couleurBois    = {0.6, 0.3, 0, 1};     /* Marron */
 
     float model_view_matrix[16], projection_matrix[16], nmv[16];
 
