@@ -43,6 +43,7 @@ Puis pour lancer le jeu :
 ```
 
 ## Présentation
+![](documentation/game.png)
 La présentation se trouve dans le [dossier de documentation](documentation/presentation.tex) du projet.
 
 ## Commandes
