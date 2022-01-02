@@ -29,6 +29,7 @@ static void sortie(void);
 
 /*!\brief Surface représentant un cube */
 static surface_t * _cube = NULL;
+static surface_t * _cubeBois = NULL;
 static float _cubeSize = 4.f;
 
 /*!\brief Surface représentant une sphère */
@@ -122,7 +123,6 @@ int main(int argc, char ** argv) {
 
 /*!\brief init de nos données, spécialement le plateau */
 void init(void) {
-    GLuint id;
     /* Création d'un screen GL4Dummies (texture dans laquelle nous
      * pouvons dessiner) aux dimensions de la fenêtre. IMPORTANT de
      * créer le screen avant d'utiliser les fonctions liées au
@@ -130,20 +130,25 @@ void init(void) {
     gl4dpInitScreen();
 
     /* Création du cube */
-    _cube   = mk_cube(); /* ça fait 2x6 triangles */
-    _sphere = mk_sphere(12, 12); /* ça fait 12x12 triangles */
+    _cube     = mk_cube(); /* ça fait 2x6 triangles */
+    _cubeBois = mk_cube(); /* ça fait 2x6 triangles */
+    _sphere   = mk_sphere(12, 12); /* ça fait 12x12 triangles */
 
     /* Rajoute la texture */
-    id = get_texture_from_BMP("images/tex.bmp");
-    set_texture_id(_cube, id);
-    set_texture_id(_sphere, id);
+    GLuint tex = get_texture_from_BMP("images/tex.bmp");
+    set_texture_id(_cube, tex);
+    set_texture_id(_sphere, tex);
+    GLuint bois = get_texture_from_BMP("images/bois.bmp");
+    set_texture_id(_cubeBois, bois);
 
     /* Affichage des textures */
     enable_surface_option(_cube, SO_USE_TEXTURE);
+    enable_surface_option(_cubeBois, SO_USE_TEXTURE);
     enable_surface_option(_sphere, SO_USE_TEXTURE);
 
     /* Affichage des ombres */
     enable_surface_option(_cube, SO_USE_LIGHTING);
+    enable_surface_option(_cubeBois, SO_USE_LIGHTING);
     enable_surface_option(_sphere, SO_USE_LIGHTING);
 
     /* Si _use_vsync != 0, on active la synchronisation verticale */
@@ -458,14 +463,14 @@ void draw(void) {
             }
             /* Bloc destructible */
             if(_plateau[i * _grilleW + j] == 4) {
-                _cube->dcolor = couleurBois;
+                _cubeBois->dcolor = couleurBois;
                 /* copie model_view_matrix dans nmv */
                 memcpy(nmv, model_view_matrix, sizeof(nmv));
 
                 /* pour convertir les coordonnées i, j de la grille en x, z du monde */
                 translate(nmv, _cubeSize * j + cX, 0.0f, _cubeSize * i + cZ);
                 scale(nmv, _cubeSize / 2.6f, _cubeSize / 2.6f, _cubeSize / 2.6f);
-                transform_n_rasterize(_cube, nmv, projection_matrix);
+                transform_n_rasterize(_cubeBois, nmv, projection_matrix);
             }
         }
 
@@ -611,6 +616,10 @@ void sortie(void) {
     if(_cube) {
         free_surface(_cube);
         _cube = NULL;
+    }
+    if(_cubeBois) {
+        free_surface(_cubeBois);
+        _cubeBois = NULL;
     }
 
     /* on libère la sphère */

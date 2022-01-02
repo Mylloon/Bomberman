@@ -53,3 +53,4 @@ La présentation se trouve dans le [dossier présentation](presentation/presenta
 
 ## Sources
 - [Image du dépôt](https://pixabay.com/vectors/bomb-cartoon-iconic-2025548/)
+- [Image du bois](https://pixabay.com/vectors/crate-box-wood-pattern-wooden-147618/)
