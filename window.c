@@ -64,7 +64,7 @@ typedef struct perso_t {
     int position;  /* Position dans la grille.
                     * Permet d'éviter aux joueurs
                     * de se rentrer dedans */
-    int bombe;     /* si une bombe est placé par le joueur,
+    double bombe;  /* si une bombe est placé par le joueur,
                     * temps écoulé depuis sa pose */
     int bombePos;  /* Position de la bombe */
 } perso_t;
@@ -323,14 +323,14 @@ void idle(void) {
     if(_vkeyboard[VK_RETURN]) {
         _vkeyboard[VK_RETURN] = 0; // on évite de spam la pose de bombe
         if(_joueurA.bombe == 0) {
-            _joueurA.bombe = (int)t + 1;
+            _joueurA.bombe = t + 1;
             _joueurA.bombePos = posJoueurA;
             if(_debug) printf("Joueur A pose une bombe!\n");
             _plateau[posJoueurA] = 6;
         }
     }
 
-    if((int)(t - (_joueurA.bombe - 1)) / 1000 > 3) { // quand la bombe doit explosé
+    if((int)(t - (_joueurA.bombe - 1)) / 1000 >= 3) { // quand la bombe doit explosé
         _joueurA.bombe = 0; // remet le timer à 0
         _plateau[_joueurA.bombePos] = 0; // vide le plateau de la bombe
         _joueurA.bombePos = -1; // supprime l'ancienne location de la bombe
@@ -392,14 +392,14 @@ void idle(void) {
     if(_vkeyboard[VK_SPACE]) {
         _vkeyboard[VK_SPACE] = 0; // on évite de spam la pose de bombe
         if(_joueurB.bombe == 0) {
-            _joueurB.bombe = (int)t + 1;
+            _joueurB.bombe = t + 1;
             _joueurB.bombePos = posJoueurB;
             if(_debug) printf("Joueur B pose une bombe!\n");
             _plateau[posJoueurB] = 7;
         }
     }
 
-    if((int)(t - (_joueurB.bombe - 1)) / 1000 > 3) { // quand la bombe doit explosé
+    if((int)(t - (_joueurB.bombe - 1)) / 1000 >= 3) { // quand la bombe doit explosé
         _joueurB.bombe = 0; // remet le timer à 0
         _plateau[_joueurB.bombePos] = 0; // vide le plateau de la bombe
         _joueurB.bombePos = -1; // supprime l'ancienne location de la bombe
@@ -495,36 +495,34 @@ void draw(void) {
             }
             /* Bombe A */
             if(_plateau[i * _grilleW + j] == 6) {
-                int temps = (int)(t - (_joueurA.bombe - 1)) / 1000;
-                if(temps <= 1) {
-                    _sphere->dcolor = couleurBombeN;
-                } else if(temps <= 2) {
+                double temps = (t - (_joueurA.bombe - 1)) / 1000;
+                _sphere->dcolor = couleurBombeN; // avant 1s
+                if((int)temps >= 1) // avant 2s
                     _sphere->dcolor = couleurBombeO;
-                } else
+                if((int)temps >= 2) // avant 3s
                     _sphere->dcolor = couleurBombeR;
                 /* copie model_view_matrix dans nmv */
                 memcpy(nmv, model_view_matrix, sizeof(nmv));
 
                 /* pour convertir les posdonnées i, j de la grille en x, z du monde */
                 translate(nmv, _cubeSize * j + cX, 0.f, _cubeSize * i + cZ);
-                scale(nmv, _cubeSize / 3.f, _cubeSize / 3.f, _cubeSize / 3.f);
+                scale(nmv, _cubeSize / 3.f + temps, _cubeSize / 3.f + temps, _cubeSize / 3.f + temps);
                 transform_n_rasterize(_sphere, nmv, projection_matrix);
             }
             /* Bombe B */
             if(_plateau[i * _grilleW + j] == 7) {
-                int temps = (int)(t - (_joueurB.bombe - 1)) / 1000;
-                if(temps <= 1) {
-                    _sphere->dcolor = couleurBombeN;
-                } else if(temps <= 2) {
+                double temps = (t - (_joueurB.bombe - 1)) / 1000;
+                _sphere->dcolor = couleurBombeN; // avant 1s
+                if((int)temps >= 1) // avant 2s
                     _sphere->dcolor = couleurBombeO;
-                } else
+                if((int)temps >= 2) // avant 3s
                     _sphere->dcolor = couleurBombeR;
                 /* copie model_view_matrix dans nmv */
                 memcpy(nmv, model_view_matrix, sizeof(nmv));
 
                 /* pour convertir les posdonnées i, j de la grille en x, z du monde */
                 translate(nmv, _cubeSize * j + cX, 0.f, _cubeSize * i + cZ);
-                scale(nmv, _cubeSize / 3.f, _cubeSize / 3.f, _cubeSize / 3.f);
+                scale(nmv, _cubeSize / 3.f + temps, _cubeSize / 3.f + temps, _cubeSize / 3.f + temps);
                 transform_n_rasterize(_sphere, nmv, projection_matrix);
             }
             /* Test voir la position des joueurs dans la grille */
