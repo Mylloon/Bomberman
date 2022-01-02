@@ -297,22 +297,22 @@ void idle(void) {
     if(_vkeyboard[VK_RIGHT])
         /* Collision à droite du joueur */
         if(_plateau[coorDroiteA] == 0 || _plateau[coorDroiteA] == 2) // si case vide ou joueur
-            if(decalageLargeurA < decalageGB || decalageLargeurA > decalageDH) _joueurA.x += vitesse * dt; // on s'assure d'être aligné
+            /* if(decalageLargeurA < decalageGB || decalageLargeurA > decalageDH) */ _joueurA.x += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_UP])
         /* Collision en haut du joueur */
         if(_plateau[coorHautA] == 0 || _plateau[coorHautA] == 2) // si case vide ou joueur
-            if(decalageLongueurA < decalageGB || decalageLongueurA > decalageDH) _joueurA.z -= vitesse * dt; // on s'assure d'être aligné
+            /* if(decalageLongueurA < decalageGB || decalageLongueurA > decalageDH) */ _joueurA.z -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_LEFT])
         /* Collision à gauche du joueur */
         if(_plateau[coorGaucheA] == 0 || _plateau[coorGaucheA] == 2) // si case vide ou joueur
-            if(decalageLargeurA < decalageGB || decalageLargeurA > decalageDH) _joueurA.x -= vitesse * dt; // on s'assure d'être aligné
+            /* if(decalageLargeurA < decalageGB || decalageLargeurA > decalageDH) */ _joueurA.x -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_DOWN])
         /* Collision en bas du joueur */
         if(_plateau[coorBasA] == 0 || _plateau[coorBasA] == 2) // si case vide ou joueur
-            if(decalageLongueurA < decalageGB || decalageLongueurA > decalageDH) _joueurA.z += vitesse * dt; // on s'assure d'être aligné
+            /* if(decalageLongueurA < decalageGB || decalageLongueurA > decalageDH) */ _joueurA.z += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_RETURN]) {
         _vkeyboard[VK_RETURN] = 0; // on évite de spam la pose de bombe
@@ -356,22 +356,22 @@ void idle(void) {
     if(_vkeyboard[VK_d])
         /* Collision à droite du joueur */
         if(_plateau[coorDroiteB] == 0 || _plateau[coorDroiteB] == 2) // si case vide ou joueur
-            if(decalageLargeurB < decalageGB || decalageLargeurB > decalageDH) _joueurB.x += vitesse * dt; // on s'assure d'être aligné
+            /* if(decalageLargeurB < decalageGB || decalageLargeurB > decalageDH) */ _joueurB.x += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_s])
         /* Collision en haut du joueur */
         if(_plateau[coorHautB] == 0 || _plateau[coorHautB] == 2) // si case vide ou joueur
-            if(decalageLongueurB < decalageGB || decalageLongueurB > decalageDH) _joueurB.z -= vitesse * dt; // on s'assure d'être aligné
+            /* if(decalageLongueurB < decalageGB || decalageLongueurB > decalageDH) */ _joueurB.z -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_q])
         /* Collision à gauche du joueur */
         if(_plateau[coorGaucheB] == 0 || _plateau[coorGaucheB] == 2) // si case vide ou joueur
-            if(decalageLargeurB < decalageGB || decalageLargeurB > decalageDH) _joueurB.x -= vitesse * dt; // on s'assure d'être aligné
+            /* if(decalageLargeurB < decalageGB || decalageLargeurB > decalageDH) */ _joueurB.x -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_s])
         /* Collision en bas du joueur */
         if(_plateau[coorBasB] == 0 || _plateau[coorBasB] == 2) // si case vide ou joueur
-                if(decalageLongueurB < decalageGB || decalageLongueurB > decalageDH) _joueurB.z += vitesse * dt; // on s'assure d'être aligné
+                /* if(decalageLongueurB < decalageGB || decalageLongueurB > decalageDH) */ _joueurB.z += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_SPACE]) {
         _vkeyboard[VK_SPACE] = 0; // on évite de spam la pose de bombe
