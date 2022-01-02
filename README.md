@@ -10,13 +10,13 @@
 |              Module | Algorithmes pour la Programmation Graphique |
 
 ## Fonctionnalités
-- [ ] Modélisation aléatoire de chaque labyrinthes (avec différents types de cubes)
-- [ ] Modélisation des joueurs avec un cône surmonté d'une sphère, de couleurs différentes
-- [ ] Modélisation de sphères noires en guise de bombes
-- [ ] Modélisation du rayon de l'explosion par des sphères jaunes dont le rayon décroit avec la distance
+- [x] Modélisation aléatoire de chaque labyrinthes (avec différents types de cubes)
+- [x] Modélisation des joueurs avec un cône (carré dans ce jeu) surmonté d'une sphère, de couleurs différentes
+- [x] Modélisation de sphères noires en guise de bombes (avec changement de couleur et grossisement)
+- [ ] Modélisation du rayon de l'explosion par des sphères jaunes dont le rayon décroit avec la distance (pas fait car fait autrement)
 - [x] Collisions et interactions logiques
 - [ ] IA ennemies
-- [ ] Mode multijoueur local
+- [x] Mode multijoueur local
 - [ ] Mode multijoueur "en ligne" (sur différentes machine)
 
 ## Récupération du projet
