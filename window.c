@@ -53,10 +53,10 @@ static int _debug = 0;
 static int * _plateau = NULL;
 
 /*!\brief Largeur/Nombre de lignes de la grille */
-static int _grilleW;
+static int _plateauW;
 
 /*!\brief Hauteur/Nombre de colonnes de la grille */
-static int _grilleH;
+static int _plateauH;
 
 /* Définition d'un personnage */
 typedef struct perso_t {
@@ -165,35 +165,35 @@ void init(void) {
     srand(time(NULL));
 
     /* Génération des dimensions du plateau */
-    _grilleW = 15 + (rand() % 10);
-    _grilleH = _grilleW;
+    _plateauW = 15 + (rand() % 10);
+    _plateauH = _plateauW;
 
     /* Placement des joueurs */
     /* Joueur A */
-    int caseA = (_grilleW * _grilleH) - (_grilleW * 2) - 3; // MAX - Wx2 - 3
-    _joueurA.x = (caseA / _grilleH) * 1.5;
-    _joueurA.z = (caseA / _grilleW) * 1.5;
+    int caseA = (_plateauW * _plateauH) - (_plateauW * 2) - 3; // MAX - Wx2 - 3
+    _joueurA.x = (caseA / _plateauH) * 1.5;
+    _joueurA.z = (caseA / _plateauW) * 1.5;
 
     /* Joueur B */
-    int caseB = (_grilleW * 2) + 3; // Wx2 + 3
-    _joueurB.x = -(caseB / _grilleH) * 12;
-    _joueurB.z = -(caseB / _grilleW) * 12;
+    int caseB = (_plateauW * 2) + 3; // Wx2 + 3
+    _joueurB.x = -(caseB / _plateauH) * 12;
+    _joueurB.z = -(caseB / _plateauW) * 12;
 
-    if((_plateau = malloc((_grilleW * _grilleH) * sizeof(int))) == NULL) {
+    if((_plateau = malloc((_plateauW * _plateauH) * sizeof(int))) == NULL) {
         printf("Impossible d'allouer de la mémoire supplémentaire pour générer le plateau.\n");
         sortie();
         exit(1);
     }
 
     /* Génération du plateau */
-    for(int i = 0; i < _grilleH; i++)
-        for(int j = 0; j < _grilleW; j++) {
-            int _case = i * _grilleH + j;
+    for(int i = 0; i < _plateauH; i++)
+        for(int j = 0; j < _plateauW; j++) {
+            int _case = i * _plateauH + j;
             if(i == 0) { // mur en haut
                 _plateau[_case] = 5;
                 continue;
             }
-            if(i == (_grilleH - 1)) { // mur en bas
+            if(i == (_plateauH - 1)) { // mur en bas
                 _plateau[_case] = 5;
                 continue;
             }
@@ -201,7 +201,7 @@ void init(void) {
                 _plateau[_case] = 5;
                 continue;
             }
-            if(j == (_grilleW - 1)) { // mur a droite
+            if(j == (_plateauW - 1)) { // mur a droite
                 _plateau[_case] = 5;
                 continue;
             }
@@ -213,9 +213,9 @@ void init(void) {
         }
 
     /* On ajoute les blocs qui sont déstructibles par les joueurs */
-    for(int i = 0; i < _grilleH; i++)
-        for(int j = 0; j < _grilleW; j++) {
-            int _case = i * _grilleH + j;
+    for(int i = 0; i < _plateauH; i++)
+        for(int j = 0; j < _plateauW; j++) {
+            int _case = i * _plateauH + j;
             if(_plateau[_case] == 0)
                 if(rand() % 3 == 0) // 1 chance sur 3
                     _plateau[_case] = 4;
@@ -230,30 +230,30 @@ void init(void) {
      * et x le joueur Attention au bordures !
      * On les fait spawn loin des bordures
      * pour éviter tout problèmes. */
-    int caseJoueurA = round((_joueurA.z + _cubeSize * _grilleH / 2) / _cubeSize) * _grilleH + round((_joueurA.x + _cubeSize * _grilleW / 2) / _cubeSize);
-    int caseJoueurB = round((_joueurB.z + _cubeSize * _grilleH / 2) / _cubeSize) * _grilleH + round((_joueurB.x + _cubeSize * _grilleW / 2) / _cubeSize);
+    int caseJoueurA = round((_joueurA.z + _cubeSize * _plateauH / 2) / _cubeSize) * _plateauH + round((_joueurA.x + _cubeSize * _plateauW / 2) / _cubeSize);
+    int caseJoueurB = round((_joueurB.z + _cubeSize * _plateauH / 2) / _cubeSize) * _plateauH + round((_joueurB.x + _cubeSize * _plateauW / 2) / _cubeSize);
 
     /* Joueur A */
     _plateau[caseJoueurA] = 2;                // x (facultatif)
-    _plateau[caseJoueurA - _grilleW - 1] = 0; // A
-    _plateau[caseJoueurA - _grilleW] = 0;     // B
-    _plateau[caseJoueurA - _grilleW + 1] = 0; // C
+    _plateau[caseJoueurA - _plateauW - 1] = 0; // A
+    _plateau[caseJoueurA - _plateauW] = 0;     // B
+    _plateau[caseJoueurA - _plateauW + 1] = 0; // C
     _plateau[caseJoueurA - 1] = 0;            // D
     _plateau[caseJoueurA + 1] = 0;            // E
-    _plateau[caseJoueurA + _grilleW - 1] = 0; // F
-    _plateau[caseJoueurA + _grilleW] = 0;     // G
-    _plateau[caseJoueurA + _grilleW + 1] = 0; // H
+    _plateau[caseJoueurA + _plateauW - 1] = 0; // F
+    _plateau[caseJoueurA + _plateauW] = 0;     // G
+    _plateau[caseJoueurA + _plateauW + 1] = 0; // H
 
     /* Joueur B */
     _plateau[caseJoueurB] = 3;                // x (facultatif)
-    _plateau[caseJoueurB - _grilleW - 1] = 0; // A
-    _plateau[caseJoueurB - _grilleW] = 0;     // B
-    _plateau[caseJoueurB - _grilleW + 1] = 0; // C
+    _plateau[caseJoueurB - _plateauW - 1] = 0; // A
+    _plateau[caseJoueurB - _plateauW] = 0;     // B
+    _plateau[caseJoueurB - _plateauW + 1] = 0; // C
     _plateau[caseJoueurB - 1] = 0;            // D
     _plateau[caseJoueurB + 1] = 0;            // E
-    _plateau[caseJoueurB + _grilleW - 1] = 0; // F
-    _plateau[caseJoueurB + _grilleW] = 0;     // G
-    _plateau[caseJoueurB + _grilleW + 1] = 0; // H
+    _plateau[caseJoueurB + _plateauW - 1] = 0; // F
+    _plateau[caseJoueurB + _plateauW] = 0;     // G
+    _plateau[caseJoueurB + _plateauW + 1] = 0; // H
 
     /* Mets en place la fonction à appeler en cas de sortie */
     atexit(sortie);
@@ -278,15 +278,15 @@ void idle(void) {
 
     /* Mouvements du Joueur A */
     /* Coordonées x, z */
-    float zA = (_joueurA.z + _cubeSize * _grilleH / 2) / _cubeSize; // ligne   - hauteur
-    float xA = (_joueurA.x + _cubeSize * _grilleW / 2) / _cubeSize; // colonne - longueur
+    float zA = (_joueurA.z + _cubeSize * _plateauH / 2) / _cubeSize; // ligne   - hauteur
+    float xA = (_joueurA.x + _cubeSize * _plateauW / 2) / _cubeSize; // colonne - longueur
 
     /* Coordonnées joueur A */
-    int posJoueurA = round(zA) * _grilleH + round(xA);
-    int posDroiteA = round(zA) * _grilleH + ceil(xA);
-    int posHautA   = floor(zA) * _grilleH + round(xA);
-    int posGaucheA = round(zA) * _grilleH + floor(xA);
-    int posBasA    = ceil(zA)  * _grilleH + round(xA);
+    int posJoueurA = round(zA) * _plateauH + round(xA);
+    int posDroiteA = round(zA) * _plateauH + ceil(xA);
+    int posHautA   = floor(zA) * _plateauH + round(xA);
+    int posGaucheA = round(zA) * _plateauH + floor(xA);
+    int posBasA    = ceil(zA)  * _plateauH + round(xA);
 
     /* Décalage pour éviter bug de collisions */
     /* float decalageLargeurA  = zA - floor(zA);
@@ -330,7 +330,45 @@ void idle(void) {
         }
     }
 
-    if((int)(t - (_joueurA.bombe - 1)) / 1000 >= 3) { // quand la bombe doit explosé
+    if((int)(t - (_joueurA.bombe - 1)) / 1000 >= 3 && _joueurA.bombe != 0) { // quand la bombe doit explosé
+        for(int i = 0; i <= 2; i++) { // on supprime les caisses aux alentours
+            /* Vérification mort d'un joueur */
+            int mort = 0;
+            if(_plateau[_joueurA.bombePos - _plateauW - i] == 2 || _plateau[_joueurA.bombePos - _plateauW - i] == 3) _plateau[_joueurA.bombePos - _plateauW - i] = 0;
+            if(_plateau[_joueurA.bombePos - _plateauW + i] == 2 || _plateau[_joueurA.bombePos - _plateauW + i] == 3) _plateau[_joueurA.bombePos - _plateauW + i] = 0;
+            if(_plateau[_joueurA.bombePos - i] == 2             || _plateau[_joueurA.bombePos - i] == 3)             _plateau[_joueurA.bombePos - i] = 0;
+            if(_plateau[_joueurA.bombePos + i] == 2             || _plateau[_joueurA.bombePos + i] == 3)             _plateau[_joueurA.bombePos + i] = 0;
+            if(_plateau[_joueurA.bombePos + _plateauW - i] == 2 || _plateau[_joueurA.bombePos + _plateauW - i] == 3) _plateau[_joueurA.bombePos + _plateauW - i] = 0;
+            if(_plateau[_joueurA.bombePos + _plateauW + i] == 2 || _plateau[_joueurA.bombePos + _plateauW + i] == 3) _plateau[_joueurA.bombePos + _plateauW + i] = 0;
+
+            /* On vérifie que les 2 joueurs sont bien dans la map,
+             * s'il en manque un c'est qu'il est probablement
+             * à la position de la bombe */
+            int trouveA = 0;
+            int trouveB = 0;
+            for(int j = _plateauW; j < _plateauH * _plateauW; j++) {
+                if(_plateau[j] == 2) trouveA = 1;
+                if(_plateau[j] == 3) trouveB = 1;
+            }
+            if(trouveA == 0) mort = 2;
+            if(trouveB == 0) mort = 3;
+            if(trouveA == 0 && trouveB == 0) mort = 4;
+
+            if(mort != 0) {
+                if(mort == 4) printf("TERMINÉ ! TOUT LE MONDE A PERDU !\n");
+                else printf("TERMINÉ ! JOUEUR %d A PERDU !\n", mort);
+                sortie();
+                exit(0);
+            }
+
+            /* Suppression des blocs touchés */
+            if(_plateau[_joueurA.bombePos - _plateauW - i] == 4) _plateau[_joueurA.bombePos - _plateauW - i] = 0;
+            if(_plateau[_joueurA.bombePos - _plateauW + i] == 4) _plateau[_joueurA.bombePos - _plateauW + i] = 0;
+            if(_plateau[_joueurA.bombePos - i] == 4)             _plateau[_joueurA.bombePos - i]             = 0;
+            if(_plateau[_joueurA.bombePos + i] == 4)             _plateau[_joueurA.bombePos + i]             = 0;
+            if(_plateau[_joueurA.bombePos + _plateauW - i] == 4) _plateau[_joueurA.bombePos + _plateauW - i] = 0;
+            if(_plateau[_joueurA.bombePos + _plateauW + i] == 4) _plateau[_joueurA.bombePos + _plateauW + i] = 0;
+        }
         _joueurA.bombe = 0; // remet le timer à 0
         _plateau[_joueurA.bombePos] = 0; // vide le plateau de la bombe
         _joueurA.bombePos = -1; // supprime l'ancienne location de la bombe
@@ -347,22 +385,22 @@ void idle(void) {
     /* Anti-collision entre joueurs */
     if(_joueurA.position != posJoueurA && _plateau[posJoueurA] != 6 && _plateau[_joueurA.position] != 6 && _plateau[posJoueurA] != 7 && _plateau[_joueurA.position] != 7) { // si position différente et pas une bombe
         _plateau[_joueurA.position] = 0; // on met l'ancienne position a un bloc vide
-        _joueurA.position = posJoueurA; // on change la position dans perso_t
         _plateau[posJoueurA] = 2; // on met a jour le plateau
     }
+    _joueurA.position = posJoueurA; // on change la position dans perso_t
 
 
     /* Mouvements du Joueur B */
     /* Coordonées x, z */
-    float zB = (float)((_joueurB.z + _cubeSize * _grilleH / 2) / _cubeSize); // ligne - hauteur
-    float xB = (float)((_joueurB.x + _cubeSize * _grilleW / 2) / _cubeSize); // colonne - longueur
+    float zB = (float)((_joueurB.z + _cubeSize * _plateauH / 2) / _cubeSize); // ligne - hauteur
+    float xB = (float)((_joueurB.x + _cubeSize * _plateauW / 2) / _cubeSize); // colonne - longueur
 
     /* Coordonnées joueur A */
-    int posJoueurB = round(zB) * _grilleH + round(xB);
-    int posDroiteB = round(zB) * _grilleH + ceil(xB);
-    int posHautB   = floor(zB) * _grilleH + round(xB);
-    int posGaucheB = round(zB) * _grilleH + floor(xB);
-    int posBasB    = ceil(zB)  * _grilleH + round(xB);
+    int posJoueurB = round(zB) * _plateauH + round(xB);
+    int posDroiteB = round(zB) * _plateauH + ceil(xB);
+    int posHautB   = floor(zB) * _plateauH + round(xB);
+    int posGaucheB = round(zB) * _plateauH + floor(xB);
+    int posBasB    = ceil(zB)  * _plateauH + round(xB);
 
     /* Décalage pour éviter bug de collisions */
     /* float decalageLargeurB  = zB - floor(zB);
@@ -399,7 +437,45 @@ void idle(void) {
         }
     }
 
-    if((int)(t - (_joueurB.bombe - 1)) / 1000 >= 3) { // quand la bombe doit explosé
+    if((int)(t - (_joueurB.bombe - 1)) / 1000 >= 3 && _joueurB.bombe != 0) { // quand la bombe doit explosé
+        for(int i = 0; i <= 2; i++) { // on supprime les caisses aux alentours
+            /* Vérification mort d'un joueur */
+            int mort = 0;
+            if(_plateau[_joueurB.bombePos - _plateauW - i] == 2 || _plateau[_joueurB.bombePos - _plateauW - i] == 3) _plateau[_joueurB.bombePos - _plateauW - i] = 0;
+            if(_plateau[_joueurB.bombePos - _plateauW + i] == 2 || _plateau[_joueurB.bombePos - _plateauW + i] == 3) _plateau[_joueurB.bombePos - _plateauW + i] = 0;
+            if(_plateau[_joueurB.bombePos - i] == 2             || _plateau[_joueurB.bombePos - i] == 3)             _plateau[_joueurB.bombePos - i] = 0;
+            if(_plateau[_joueurB.bombePos + i] == 2             || _plateau[_joueurB.bombePos + i] == 3)             _plateau[_joueurB.bombePos + i] = 0;
+            if(_plateau[_joueurB.bombePos + _plateauW - i] == 2 || _plateau[_joueurB.bombePos + _plateauW - i] == 3) _plateau[_joueurB.bombePos + _plateauW - i] = 0;
+            if(_plateau[_joueurB.bombePos + _plateauW + i] == 2 || _plateau[_joueurB.bombePos + _plateauW + i] == 3) _plateau[_joueurB.bombePos + _plateauW + i] = 0;
+
+            /* On vérifie que les 2 joueurs sont bien dans la map,
+             * s'il en manque un c'est qu'il est probablement
+             * à la position de la bombe */
+            int trouveA = 0;
+            int trouveB = 0;
+            for(int j = _plateauW; j < _plateauH * _plateauW; j++) {
+                if(_plateau[j] == 2) trouveA = 1;
+                if(_plateau[j] == 3) trouveB = 1;
+            }
+            if(trouveA == 0) mort = 2;
+            if(trouveB == 0) mort = 3;
+            if(trouveA == 0 && trouveB == 0) mort = 4;
+
+            if(mort != 0) {
+                if(mort == 4) printf("TERMINÉ ! TOUT LE MONDE A PERDU !\n");
+                else printf("TERMINÉ ! JOUEUR %d A PERDU !\n", mort);
+                sortie();
+                exit(0);
+            }
+
+            /* Suppression des blocs touchés */
+            if(_plateau[_joueurB.bombePos - _plateauW - i] == 4) _plateau[_joueurB.bombePos - _plateauW - i] = 0;
+            if(_plateau[_joueurB.bombePos - _plateauW + i] == 4) _plateau[_joueurB.bombePos - _plateauW + i] = 0;
+            if(_plateau[_joueurB.bombePos - i] == 4)             _plateau[_joueurB.bombePos - i]             = 0;
+            if(_plateau[_joueurB.bombePos + i] == 4)             _plateau[_joueurB.bombePos + i]             = 0;
+            if(_plateau[_joueurB.bombePos + _plateauW - i] == 4) _plateau[_joueurB.bombePos + _plateauW - i] = 0;
+            if(_plateau[_joueurB.bombePos + _plateauW + i] == 4) _plateau[_joueurB.bombePos + _plateauW + i] = 0;
+        }
         _joueurB.bombe = 0; // remet le timer à 0
         _plateau[_joueurB.bombePos] = 0; // vide le plateau de la bombe
         _joueurB.bombePos = -1; // supprime l'ancienne location de la bombe
@@ -417,9 +493,9 @@ void idle(void) {
     /* Anti-collision entre joueurs */
     if(_joueurB.position != posJoueurB && _plateau[posJoueurB] != 6 && _plateau[_joueurB.position] != 6 && _plateau[posJoueurB] != 7 && _plateau[_joueurB.position] != 7) { // si position différente et pas une bombe
         _plateau[_joueurB.position] = 0; // on met l'ancienne position a un bloc vide
-        _joueurB.position = posJoueurB; // on change la position dans perso_t
         _plateau[posJoueurB] = 3; // on met a jour le plateau
     }
+    _joueurB.position = posJoueurB; // on change la position dans perso_t
 }
 
 /*!\brief Fonction appelée à chaque display. */
@@ -449,19 +525,19 @@ void draw(void) {
     /* Charger la matrice identité dans model-view */
     MIDENTITY(model_view_matrix);
     /* On place la caméra en arrière-haut, elle regarde le centre de la scène */
-    int coefTaille = -20 + _grilleW * 2.5;
+    int coefTaille = -20 + _plateauW * 2.5;
     lookAt(model_view_matrix, 0, 70 + coefTaille /* zoom */, 30 + coefTaille /* inclinaison */, 0, 0, 0, 0, 0, -1);
 
     /* Pour centrer la grille par rapport au monde */
-    float cX = -_cubeSize * _grilleW / 2.0f;
-    float cZ = -_cubeSize * _grilleH / 2.0f;
+    float cX = -_cubeSize * _plateauW / 2.0f;
+    float cZ = -_cubeSize * _plateauH / 2.0f;
 
     /* Pour toutes les cases de la grille, afficher un cube quand il y a
      * un 1 dans la grille */
-    for(int i = 0; i < _grilleW; ++i)
-        for(int j = 0; j < _grilleH; ++j) {
+    for(int i = 0; i < _plateauW; ++i)
+        for(int j = 0; j < _plateauH; ++j) {
             /* Bloc simple */
-            if(_plateau[i * _grilleW + j] == 1) {
+            if(_plateau[i * _plateauW + j] == 1) {
                 _cube->dcolor = couleurMur;
                 /* copie model_view_matrix dans nmv */
                 memcpy(nmv, model_view_matrix, sizeof(nmv));
@@ -472,7 +548,7 @@ void draw(void) {
                 transform_n_rasterize(_cube, nmv, projection_matrix);
             }
             /* Mur exterieur */
-            if(_plateau[i * _grilleW + j] == 5) {
+            if(_plateau[i * _plateauW + j] == 5) {
                 _cube->dcolor = couleurMurExterieur;
                 /* copie model_view_matrix dans nmv */
                 memcpy(nmv, model_view_matrix, sizeof(nmv));
@@ -483,7 +559,7 @@ void draw(void) {
                 transform_n_rasterize(_cube, nmv, projection_matrix);
             }
             /* Bloc destructible */
-            if(_plateau[i * _grilleW + j] == 4) {
+            if(_plateau[i * _plateauW + j] == 4) {
                 _cubeBois->dcolor = couleurBois;
                 /* copie model_view_matrix dans nmv */
                 memcpy(nmv, model_view_matrix, sizeof(nmv));
@@ -494,7 +570,7 @@ void draw(void) {
                 transform_n_rasterize(_cubeBois, nmv, projection_matrix);
             }
             /* Bombe A */
-            if(_plateau[i * _grilleW + j] == 6) {
+            if(_plateau[i * _plateauW + j] == 6) {
                 double temps = (t - (_joueurA.bombe - 1)) / 1000;
                 _sphere->dcolor = couleurBombeN; // avant 1s
                 if((int)temps >= 1) // avant 2s
@@ -506,11 +582,11 @@ void draw(void) {
 
                 /* pour convertir les posdonnées i, j de la grille en x, z du monde */
                 translate(nmv, _cubeSize * j + cX, 0.f, _cubeSize * i + cZ);
-                scale(nmv, _cubeSize / 3.f + temps, _cubeSize / 3.f + temps, _cubeSize / 3.f + temps);
+                scale(nmv, _cubeSize / 3.f + (temps *1.5), _cubeSize / 3.f + (temps *1.5), _cubeSize / 3.f + (temps *1.5));
                 transform_n_rasterize(_sphere, nmv, projection_matrix);
             }
             /* Bombe B */
-            if(_plateau[i * _grilleW + j] == 7) {
+            if(_plateau[i * _plateauW + j] == 7) {
                 double temps = (t - (_joueurB.bombe - 1)) / 1000;
                 _sphere->dcolor = couleurBombeN; // avant 1s
                 if((int)temps >= 1) // avant 2s
@@ -522,11 +598,11 @@ void draw(void) {
 
                 /* pour convertir les posdonnées i, j de la grille en x, z du monde */
                 translate(nmv, _cubeSize * j + cX, 0.f, _cubeSize * i + cZ);
-                scale(nmv, _cubeSize / 3.f + temps, _cubeSize / 3.f + temps, _cubeSize / 3.f + temps);
+                scale(nmv, _cubeSize / 3.f + (temps *1.5), _cubeSize / 3.f + (temps *1.5), _cubeSize / 3.f + (temps *1.5));
                 transform_n_rasterize(_sphere, nmv, projection_matrix);
             }
             /* Test voir la position des joueurs dans la grille */
-            /* if(_plateau[i * _grilleW + j] == 2 || _plateau[i * _grilleW + j] == 3) {
+            /* if(_plateau[i * _plateauW + j] == 2 || _plateau[i * _plateauW + j] == 3) {
                 vec4 blanc = {1, 1, 1, 1};
                 _sphere->dcolor = blanc;
                 memcpy(nmv, model_view_matrix, sizeof(nmv));
