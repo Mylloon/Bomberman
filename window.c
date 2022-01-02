@@ -358,7 +358,7 @@ void idle(void) {
         if(_plateau[coorDroiteB] == 0 || _plateau[coorDroiteB] == 3) // si case vide ou joueur
             /* if(decalageLargeurB < decalageGB || decalageLargeurB > decalageDH) */ _joueurB.x += vitesse * dt; // on s'assure d'être aligné
 
-    if(_vkeyboard[VK_s])
+    if(_vkeyboard[VK_z])
         /* Collision en haut du joueur */
         if(_plateau[coorHautB] == 0 || _plateau[coorHautB] == 3) // si case vide ou joueur
             /* if(decalageLongueurB < decalageGB || decalageLongueurB > decalageDH) */ _joueurB.z -= vitesse * dt; // on s'assure d'être aligné
