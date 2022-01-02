@@ -46,8 +46,8 @@ Puis pour lancer le jeu :
 La présentation se trouve dans le [dossier de documentation](documentation/presentation.tex) du projet.
 
 ## Commandes
-- Déplacement du joueur A avec les flèches directionnelles `↑ ← → ↓`
-- Déplacement du joueur B avec les touches `Z Q S D`
+- Déplacement du joueur A avec les flèches directionnelles `↑ ← → ↓` et pose de la bombe avec `Entrée`
+- Déplacement du joueur B avec les touches `Z Q S D` et pose de la bombe avec la `barre espace`
 - Activation/Désactivation de la synchronisation verticale à l'appuie de la touche `v`
 - Activation/Désactivation des logs de debug dans la console à l'appuie de la touche `h`
 
