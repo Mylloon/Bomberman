@@ -266,9 +266,9 @@ void idle(void) {
     float vitesse = 9.f; // vitesse des joueurs
 
     /* Calcul du décalage */
-    float decalageAutorisee = .2f; // décalage autorisé, modifier cette valeur si nécessaire
+    /* float decalageAutorisee = .2f; // décalage autorisé, modifier cette valeur si nécessaire
     float decalageGB = .0f + decalageAutorisee; // décalage pour la gauche et le bas
-    float decalageDH = 1.f - decalageAutorisee; // décalage pour la droite et le haut
+    float decalageDH = 1.f - decalageAutorisee; // décalage pour la droite et le haut */
 
     /* Mouvements du Joueur A */
     /* Coordonées x, z */
@@ -283,8 +283,8 @@ void idle(void) {
     int coorBasA    = ceil(zA)  * _grilleH + round(xA);
 
     /* Décalage pour éviter bug de collisions */
-    float decalageLargeurA  = zA - floor(zA);
-    float decalageLongueurA = xA - floor(xA);
+    /* float decalageLargeurA  = zA - floor(zA);
+    float decalageLongueurA = xA - floor(xA); */
 
     /* Déplacement
      * Pour la vérification du "si mur"
@@ -349,28 +349,28 @@ void idle(void) {
     int coorBasB    = ceil(zB)  * _grilleH + round(xB);
 
     /* Décalage pour éviter bug de collisions */
-    float decalageLargeurB  = zB - floor(zB);
-    float decalageLongueurB = xB - floor(xB);
+    /* float decalageLargeurB  = zB - floor(zB);
+    float decalageLongueurB = xB - floor(xB); */
 
     /* Déplacement */
     if(_vkeyboard[VK_d])
         /* Collision à droite du joueur */
-        if(_plateau[coorDroiteB] == 0 || _plateau[coorDroiteB] == 2) // si case vide ou joueur
+        if(_plateau[coorDroiteB] == 0 || _plateau[coorDroiteB] == 3) // si case vide ou joueur
             /* if(decalageLargeurB < decalageGB || decalageLargeurB > decalageDH) */ _joueurB.x += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_s])
         /* Collision en haut du joueur */
-        if(_plateau[coorHautB] == 0 || _plateau[coorHautB] == 2) // si case vide ou joueur
+        if(_plateau[coorHautB] == 0 || _plateau[coorHautB] == 3) // si case vide ou joueur
             /* if(decalageLongueurB < decalageGB || decalageLongueurB > decalageDH) */ _joueurB.z -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_q])
         /* Collision à gauche du joueur */
-        if(_plateau[coorGaucheB] == 0 || _plateau[coorGaucheB] == 2) // si case vide ou joueur
+        if(_plateau[coorGaucheB] == 0 || _plateau[coorGaucheB] == 3) // si case vide ou joueur
             /* if(decalageLargeurB < decalageGB || decalageLargeurB > decalageDH) */ _joueurB.x -= vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_s])
         /* Collision en bas du joueur */
-        if(_plateau[coorBasB] == 0 || _plateau[coorBasB] == 2) // si case vide ou joueur
+        if(_plateau[coorBasB] == 0 || _plateau[coorBasB] == 3) // si case vide ou joueur
                 /* if(decalageLongueurB < decalageGB || decalageLongueurB > decalageDH) */ _joueurB.z += vitesse * dt; // on s'assure d'être aligné
 
     if(_vkeyboard[VK_SPACE]) {
@@ -382,7 +382,7 @@ void idle(void) {
     if(_debug) {
         printf("========== Joueur B ==========\n");
         printf(" li = %d, col = %d, idx = %d\n", (int)(zB + .5f), (int)(xB + .5f), _joueurB.position);
-        printf(" zA=%f xA=%f\n", zB, xB);
+        printf(" zB=%f xB=%f\n", zB, xB);
         printf(" d=%d h=%d g=%d b=%d\n", coorDroiteB, coorHautB, coorGaucheB, coorBasB);
         printf("===============================\n");
     }
