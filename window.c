@@ -60,14 +60,16 @@ static int _grilleH;
 /* Définition d'un personnage */
 typedef struct perso_t {
     float x, y, z; /* Coordonées spatiale */
-    int position; /* Position dans la grille.
-                   * Permet d'éviter aux joueurs
-                   * de se rentrer dedans */
+    int position;  /* Position dans la grille.
+                    * Permet d'éviter aux joueurs
+                    * de se rentrer dedans */
+    int bombe;     /* si une bombe est placé par le joueur,
+                    * temps écoulé depuis sa pose */
 } perso_t;
 
 /* Définition de nos deux joueurs */
-perso_t _joueurA = { 0.f, 0.f, 0.f, -1 }; // à droite
-perso_t _joueurB = { 0.f, 0.f, 6.f, -1 }; // à gauche
+perso_t _joueurA = { 0.f, 0.f, 0.f, -1, 0 }; // à droite
+perso_t _joueurB = { 0.f, 0.f, 6.f, -1, 0 }; // à gauche
 
 /* Clavier virtuel */
 enum {
@@ -318,14 +320,19 @@ void idle(void) {
 
     if(_vkeyboard[VK_RETURN]) {
         _vkeyboard[VK_RETURN] = 0; // on évite de spam la pose de bombe
-        printf("Joueur A pose une bombe!\n"); // temp
-        _plateau[posJoueurA] = 6;
+        if(_joueurA.bombe == 0) {
+            _joueurA.bombe = (int)t + 1;
+            if(_debug) printf("Joueur A pose une bombe!\n");
+            _plateau[posJoueurA] = 6;
+        } else {
+            printf("bombe déjà posé il y a %d secondes\n", (int)(t - (_joueurA.bombe - 1)) / 1000);
+        }
     }
 
     /* Affichage Debug */
     if(_debug) {
         printf("\n========== Joueur A ==========\n");
-        printf(" li = %d, col = %d, idx = %d\n", (int)(zA + .5f), (int)(xA + .5f), _joueurA.position);
+        printf(" li = %d, col = %d, idx = %d\n", (int)(zA + .5f), (int)(xA + .5f), _joueurA.position); // round avec cast int
         printf(" zA=%f xA=%f\n", zA, xA);
         printf(" d=%d h=%d g=%d b=%d\n", posDroiteA, posHautA, posGaucheA, posBasA);
     }
@@ -377,14 +384,17 @@ void idle(void) {
 
     if(_vkeyboard[VK_SPACE]) {
         _vkeyboard[VK_SPACE] = 0; // on évite de spam la pose de bombe
-        printf("Joueur B pose une bombe!\n"); // temp
-        _plateau[posJoueurB] = 6;
+        if(_joueurB.bombe == 0) {
+            _joueurB.bombe = 1;
+            if(_debug) printf("Joueur B pose une bombe!\n");
+            _plateau[posJoueurB] = 6;
+        }
     }
 
     /* Affichage Debug */
     if(_debug) {
         printf("========== Joueur B ==========\n");
-        printf(" li = %d, col = %d, idx = %d\n", (int)(zB + .5f), (int)(xB + .5f), _joueurB.position);
+        printf(" li = %d, col = %d, idx = %d\n", (int)(zB + .5f), (int)(xB + .5f), _joueurB.position); // round avec cast int
         printf(" zB=%f xB=%f\n", zB, xB);
         printf(" d=%d h=%d g=%d b=%d\n", posDroiteB, posHautB, posGaucheB, posBasB);
         printf("===============================\n");
@@ -400,12 +410,12 @@ void idle(void) {
 
 /*!\brief Fonction appelée à chaque display. */
 void draw(void) {
-    vec4 couleurMur          = {0.2,  0.2,  0.2, 1},   /* Gris */
+    vec4 couleurMur          = { 0.2, 0.2,  0.2, 1}, /* Gris */
          couleurJoueurA      = {0.15, 0.5, 0.15, 1}, /* Vert */
-         couleurJoueurB      = {0.2,  0.2,  0.7, 1},   /* Bleu */
-         couleurMurExterieur = {0.1,  0.1,  0.1, 1},   /* Gris foncé */
-         couleurBois         = {0.6,  0.3,    0, 1},     /* Marron */
-         couleurBombe        = {1.,     0,    0, 1};         /* Rouge */
+         couleurJoueurB      = { 0.2, 0.2,  0.7, 1}, /* Bleu */
+         couleurMurExterieur = { 0.1, 0.1,  0.1, 1}, /* Gris foncé */
+         couleurBois         = { 0.6, 0.3,    0, 1}, /* Marron */
+         couleurBombe        = {   1,   0,    0, 1}; /* Rouge */
 
     float model_view_matrix[16], projection_matrix[16], nmv[16];
 
