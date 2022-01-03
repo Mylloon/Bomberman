@@ -65,7 +65,7 @@ typedef struct perso_t {
                     * Permet d'éviter aux joueurs
                     * de se rentrer dedans */
     double bombe;  /* si une bombe est placé par le joueur,
-                    * temps écoulé depuis sa pose */
+                    * temps à laquelle elle a été posée */
     int bombePos;  /* Position de la bombe */
 } perso_t;
 
@@ -377,15 +377,15 @@ void idle(void) {
 
             /* On fait le compta des morts seulement lors de la dernière boucle */
             if(i == 2) {
-                int mort = 0;
-                if(trouveA) mort = 1;
-                if(trouveB) mort = 2;
-                if(trouveA && trouveB) mort = 3;
+                int gagnant = 0;
+                if(trouveA) gagnant = 1;
+                if(trouveB) gagnant = 2;
+                if(trouveA && trouveB) gagnant = 3;
 
-                if(mort != 0) {
-                    char joueur = 'A';
-                    if(mort) joueur = 'B';
-                    if(mort == 3) printf("TERMINÉ ! TOUT LE MONDE À PERDU !\n");
+                if(gagnant != 0) {
+                    char joueur = 'B';
+                    if(gagnant == 2) joueur = 'A';
+                    if(gagnant == 3) printf("TERMINÉ ! TOUT LE MONDE À PERDU !\n");
                     else printf("TERMINÉ ! JOUEUR %c À GAGNÉ !\n", joueur);
                     sortie();
                 }
@@ -492,15 +492,15 @@ void idle(void) {
 
             /* On fait le compta des morts seulement lors de la dernière boucle */
             if(i == 2) {
-                int mort = 0;
-                if(trouveA) mort = 1;
-                if(trouveB) mort = 2;
-                if(trouveA && trouveB) mort = 3;
+                int gagnant = 0;
+                if(trouveA) gagnant = 1;
+                if(trouveB) gagnant = 2;
+                if(trouveA && trouveB) gagnant = 3;
 
-                if(mort != 0) {
-                    char joueur = 'A';
-                    if(mort) joueur = 'B';
-                    if(mort == 3) printf("TERMINÉ ! TOUT LE MONDE À PERDU !\n");
+                if(gagnant != 0) {
+                    char joueur = 'B';
+                    if(gagnant == 2) joueur = 'A';
+                    if(gagnant == 3) printf("TERMINÉ ! TOUT LE MONDE À PERDU !\n");
                     else printf("TERMINÉ ! JOUEUR %c À GAGNÉ !\n", joueur);
                     sortie();
                 }
